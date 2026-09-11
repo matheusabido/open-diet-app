@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -42,13 +43,31 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.amber,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Text(
-              "Teste",
-              style: TextStyle(
-                fontSize: 18,
+            child: SizedBox(
+              height: 150,
+              child: PieChart(
+                  PieChartData(
+                    centerSpaceRadius: 0,
+                    sections: [
+                      PieChartSectionData(
+                        value: 10,
+                        color: Colors.red,
+                        title: "10g",
+                        radius: 60,
+                      ),
+                      PieChartSectionData(
+                        value: 20,
+                        color: Colors.blue,
+                        title: "20g",
+                        radius: 60,
+                      )
+                    ]
+                  ),
+                  duration: Duration(milliseconds: 150),
+                  curve: Curves.linear,
+                )
               ),
-            ),
-          ),
+            )
         ),
       )
     );
