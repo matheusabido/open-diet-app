@@ -37,62 +37,102 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            decoration: BoxDecoration(
-              color: AppColors.container,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: .min,
-              children: [
-                Text(
-                  "Suas Estatísticas",
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: .w500,
-                  ),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                decoration: BoxDecoration(
+                  color: AppColors.container,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                SizedBox(
-                  height: 150,
-                  child: Row(
-                    children: [
-                      Expanded(child: NutritionChart()),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: .min,
-                          children: [
-                            LinearProgressIndicator(
-                              value: 0.5,
-                              color: Colors.blue,
-                              borderRadius: .circular(8),
-                              minHeight: 6,
-                            ),
-                            SizedBox(height: 16),
-                            LinearProgressIndicator(
-                              value: 0.5,
-                              color: Colors.red,
-                              borderRadius: .circular(8),
-                              minHeight: 6,
-                            ),
-                            SizedBox(height: 16),
-                            LinearProgressIndicator(
-                              value: 0.5,
-                              color: Colors.green,
-                              borderRadius: .circular(8),
-                              minHeight: 6,
-                            ),
-                          ],
-                        ),
+                child: Column(
+                  mainAxisSize: .min,
+                  children: [
+                    Text(
+                      "Suas Estatísticas",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: .w500,
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      height: 150,
+                      child: Row(
+                        children: [
+                          Expanded(child: NutritionChart()),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: .min,
+                              children: [
+                                LinearProgressIndicator(
+                                  value: 0.5,
+                                  color: Colors.blue,
+                                  borderRadius: .circular(8),
+                                  minHeight: 6,
+                                ),
+                                SizedBox(height: 16),
+                                LinearProgressIndicator(
+                                  value: 0.5,
+                                  color: Colors.red,
+                                  borderRadius: .circular(8),
+                                  minHeight: 6,
+                                ),
+                                SizedBox(height: 16),
+                                LinearProgressIndicator(
+                                  value: 0.5,
+                                  color: Colors.green,
+                                  borderRadius: .circular(8),
+                                  minHeight: 6,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 )
-              ],
-            )
-          )
+              ),
+              SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                decoration: BoxDecoration(
+                  color: AppColors.container,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Café da Manhã",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              fontWeight: .w500,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: ()=> {
+                            print("Hello")
+                          },
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
       backgroundColor: AppColors.background,
