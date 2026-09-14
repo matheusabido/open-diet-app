@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_diet/components/bottom_navigation_bar.dart';
 import 'package:open_diet/components/nutrition_chart.dart';
 import 'package:open_diet/theme/colors.dart';
 
@@ -34,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: AppBottomNav(currentIndex: 1),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -124,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                         IconButton(
-                          onPressed: ()=> {
+                          onPressed: () => {
                             print("Hello")
                           },
                           icon: const Icon(
