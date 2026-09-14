@@ -1,5 +1,5 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:open_diet/components/nutrition_chart.dart';
 import 'package:open_diet/theme/colors.dart';
 
 void main() {
@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 decoration: BoxDecoration(
                   color: AppColors.container,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
                   mainAxisSize: .min,
@@ -61,18 +61,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       height: 150,
                       child: Row(
                         children: [
-                          Expanded(child: NutritionChart()),
+                          NutritionChart(
+                            proteinGrams: 50,
+                            carbohydrateGrams: 30,
+                            fatGrams: 20,
+                            size: 120,
+                          ),
+                          SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               mainAxisSize: .min,
                               children: [
-                                LinearProgressIndicator(
-                                  value: 0.5,
-                                  color: Colors.blue,
-                                  borderRadius: .circular(8),
-                                  minHeight: 6,
-                                ),
-                                SizedBox(height: 16),
                                 LinearProgressIndicator(
                                   value: 0.5,
                                   color: Colors.red,
@@ -82,7 +81,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                 SizedBox(height: 16),
                                 LinearProgressIndicator(
                                   value: 0.5,
-                                  color: Colors.green,
+                                  color: Colors.blue,
+                                  borderRadius: .circular(8),
+                                  minHeight: 6,
+                                ),
+                                SizedBox(height: 16),
+                                LinearProgressIndicator(
+                                  value: 0.5,
+                                  color: Colors.amber,
                                   borderRadius: .circular(8),
                                   minHeight: 6,
                                 ),
@@ -101,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                 decoration: BoxDecoration(
                   color: AppColors.container,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
                   children: [
@@ -136,41 +142,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       backgroundColor: AppColors.background,
-    );
-  }
-}
-
-class NutritionChart extends StatelessWidget {
-  const NutritionChart({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return PieChart(
-      PieChartData(
-        centerSpaceRadius: 0,
-        sections: [
-          PieChartSectionData(
-            value: 10,
-            color: Colors.red,
-            title: "10g",
-            radius: 60,
-          ),
-          PieChartSectionData(
-            value: 20,
-            color: Colors.blue,
-            title: "20g",
-            radius: 60,
-          ),
-          PieChartSectionData(
-            value: 50,
-            color: Colors.green,
-            title: "50g",
-            radius: 60,
-          )
-        ]
-      ),
-      duration: Duration(milliseconds: 150),
-      curve: Curves.linear,
     );
   }
 }
