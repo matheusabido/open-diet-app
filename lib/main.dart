@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/bottom_navigation_bar.dart';
 import 'package:open_diet/components/nutrition_chart.dart';
+import 'package:open_diet/components/stats_card.dart';
 import 'package:open_diet/theme/colors.dart';
 
 void main() {
@@ -41,67 +42,13 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                decoration: BoxDecoration(
-                  color: AppColors.container,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisSize: .min,
-                  children: [
-                    Text(
-                      "Suas Estatísticas",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: .w500,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 150,
-                      child: Row(
-                        children: [
-                          NutritionChart(
-                            proteinGrams: 50,
-                            carbohydrateGrams: 30,
-                            fatGrams: 20,
-                            size: 120,
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: .min,
-                              children: [
-                                LinearProgressIndicator(
-                                  value: 0.5,
-                                  color: Colors.red,
-                                  borderRadius: .circular(8),
-                                  minHeight: 6,
-                                ),
-                                SizedBox(height: 16),
-                                LinearProgressIndicator(
-                                  value: 0.5,
-                                  color: Colors.blue,
-                                  borderRadius: .circular(8),
-                                  minHeight: 6,
-                                ),
-                                SizedBox(height: 16),
-                                LinearProgressIndicator(
-                                  value: 0.5,
-                                  color: Colors.amber,
-                                  borderRadius: .circular(8),
-                                  minHeight: 6,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                )
+              StatsCard(
+                proteinGrams: 50,
+                proteinGoal: 136,
+                carbohydrateGrams: 30,
+                carbohydrateGoal: 181,
+                fatGrams: 20,
+                fatGoal: 60,
               ),
               SizedBox(height: 16),
               Container(
