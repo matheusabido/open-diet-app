@@ -84,7 +84,7 @@ class NutritionProgressBar extends StatefulWidget {
   final Color color;
 
   @override
-  State<StatefulWidget> createState() => NutritionChartState();
+  State<StatefulWidget> createState() => NutritionProgressBarState();
 }
 
 class NutritionProgressBarState extends State<NutritionProgressBar> {
