@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/bottom_navigation_bar.dart';
-import 'package:open_diet/components/nutrition_chart.dart';
 import 'package:open_diet/components/stats_card.dart';
 import 'package:open_diet/theme/colors.dart';
 
@@ -52,12 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               SizedBox(height: 16),
               Container(
-                width: double.infinity,
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                 decoration: BoxDecoration(
                   color: AppColors.container,
                   borderRadius: BorderRadius.circular(8),
                 ),
+                padding: .fromLTRB(16, 8, 8, 8),
                 child: Column(
                   children: [
                     Row(
@@ -66,13 +64,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Text(
                             "Café da Manhã",
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: Colors.white,
                               fontSize: 14,
                               fontWeight: .w500,
                             ),
                           ),
                         ),
                         IconButton(
+                          style: IconButton.styleFrom(
+                            padding: EdgeInsets.all(8),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           onPressed: () => {
                             print("Hello")
                           },
@@ -85,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
