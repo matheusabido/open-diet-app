@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class AppBottomNav extends StatefulWidget {
-  const AppBottomNav({super.key, required this.currentIndex});
+  const AppBottomNav({super.key, required this.currentIndex, required this.onChange});
 
   final int currentIndex;
+  final Function(int) onChange;
 
   @override
   State<StatefulWidget> createState() => AppBottomNavState();
@@ -23,6 +24,8 @@ class AppBottomNavState extends State<AppBottomNav> {
       unselectedFontSize: 12,
 
       currentIndex: widget.currentIndex,
+      onTap: widget.onChange,
+
       items: const [
         BottomNavigationBarItem(
           label: "Cadastros",
