@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_diet/components/food_item.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class MealSection extends StatefulWidget {
@@ -18,8 +19,9 @@ class MealSectionState extends State<MealSection> {
         color: AppColors.container,
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: .fromLTRB(16, 8, 8, 8),
+      padding: .all(16),
       child: Column(
+        spacing: 8,
         children: [
           Row(
             children: [
@@ -27,15 +29,15 @@ class MealSectionState extends State<MealSection> {
                 child: Text(
                   widget.title,
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                    color: Colors.white70,
+                    fontSize: 16,
                     fontWeight: .w500,
                   ),
                 ),
               ),
               IconButton(
                 style: IconButton.styleFrom(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -48,7 +50,10 @@ class MealSectionState extends State<MealSection> {
                 ),
               ),
             ],
-          )
+          ),
+
+          FoodItem(name: "Pizza", kcal: 400, amount: 1, unit: "un"),
+          FoodItem(name: "Ice Cream", kcal: 123, amount: 60, unit: "g"),
         ],
       ),
     );

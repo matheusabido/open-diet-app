@@ -54,10 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onChange: onChangeTab,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: _pages[currentPageIndex],
-        ),
+        child: _pages[currentPageIndex],
       ),
       backgroundColor: AppColors.background,
     );
