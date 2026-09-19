@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/bottom_navigation_bar.dart';
 import 'package:open_diet/pages/foods_page.dart';
