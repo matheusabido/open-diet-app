@@ -3,9 +3,10 @@ import 'package:open_diet/components/food_item.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class MealSection extends StatefulWidget {
-  const MealSection({super.key, required this.title});
+  const MealSection({super.key, required this.title, required this.totalKcal});
 
   final String title;
+  final double totalKcal;
 
   @override
   State<StatefulWidget> createState() => MealSectionState();
@@ -14,6 +15,10 @@ class MealSection extends StatefulWidget {
 class MealSectionState extends State<MealSection> {
   @override
   Widget build(BuildContext context) {
+    const amountTextStyle = TextStyle(
+      color: Colors.white70,
+    );
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.container,
@@ -26,13 +31,24 @@ class MealSectionState extends State<MealSection> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  widget.title,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                    fontWeight: .w500,
-                  ),
+                child: Row(
+                  spacing: 8,
+                  crossAxisAlignment: .center,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: .w500,
+                      ),
+                    ),
+                    Text("·", style: amountTextStyle),
+                    Text(
+                      "${widget.totalKcal.round()} kcal",
+                      style: amountTextStyle,
+                    ),
+                  ],
                 ),
               ),
               IconButton(

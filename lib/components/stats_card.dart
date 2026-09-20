@@ -54,7 +54,8 @@ class StatsCardState extends State<StatsCard> {
                 proteinGrams: widget.proteinGrams,
                 carbohydrateGrams: widget.carbohydrateGrams,
                 fatGrams: widget.fatGrams,
-                size: 120,
+                kcalRemaining: 1234,
+                size: 130,
               ),
 
               Expanded(
