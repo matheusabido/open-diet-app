@@ -85,10 +85,15 @@ class NutritionChartState extends State<NutritionChart> {
           ),
           Column(
             mainAxisAlignment: .center,
-            spacing: -4,
             children: [
               Text(widget.kcalRemaining.round().toString(), style: kcalTextStyle),
-              Text("kcal restantes", style: kcalSubtextStyle)
+              Transform.translate(
+                offset: const Offset(0, -4),
+                child: Text(
+                  "kcal restantes",
+                  style: kcalSubtextStyle,
+                ),
+              ),
             ],
           ),
         ],
