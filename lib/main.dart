@@ -16,9 +16,7 @@ class OpenDietApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Open Diet',
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.green),
-      ),
+      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.green)),
       home: const MyHomePage(),
     );
   }
@@ -40,11 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  static const _pages = [
-    FoodsPage(),
-    MealsPage(),
-    ProfilePage(),
-  ];
+  static const _pages = [FoodsPage(), MealsPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: currentPageIndex,
         onChange: onChangeTab,
       ),
-      body: SafeArea(
-        child: _pages[currentPageIndex],
-      ),
+      body: SafeArea(child: _pages[currentPageIndex]),
       backgroundColor: AppColors.background,
     );
   }
