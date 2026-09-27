@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:open_diet/theme/colors.dart';
+import 'package:open_diet/components/input/text_input.dart';
 
-class FoodsPage extends StatelessWidget {
+class FoodsPage extends StatefulWidget {
   const FoodsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(
-        color: AppColors.container2,
-      ),
-    );
-    
-    final controller = TextEditingController();
+  State<FoodsPage> createState() => _FoodsPageState();
+}
 
+class _FoodsPageState extends State<FoodsPage> {
+  final controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: .all(16),
       child: Column(
@@ -25,25 +23,8 @@ class FoodsPage extends StatelessWidget {
               Expanded(
                 child: SizedBox(
                   height: 48,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Pesquisar por nome...',
-
-                      enabledBorder: border,
-                      focusedBorder: border,
-
-                      contentPadding: .all(8),
-
-                      filled: true,
-                      fillColor: AppColors.container,
-                      
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: Colors.grey.shade200,
-                    ),
+                  child: TextInput(
+                    hint: 'Pesquisar por nome...',
                     controller: controller,
                   ),
                 ),
@@ -67,5 +48,11 @@ class FoodsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }
