@@ -4,6 +4,7 @@ import 'package:open_diet/pages/foods_page.dart';
 import 'package:open_diet/pages/login_page.dart';
 import 'package:open_diet/pages/meals_page.dart';
 import 'package:open_diet/pages/profile_page.dart';
+import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
 
 void main() {
@@ -40,16 +41,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   static const _pages = [FoodsPage(), MealsPage(), ProfilePage()];
-  final loggedIn = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: loggedIn
-          ? AppBottomNav(currentIndex: currentPageIndex, onChange: onChangeTab)
-          : null,
-      body: SafeArea(child: loggedIn ? _pages[currentPageIndex] : LoginPage()),
-      backgroundColor: AppColors.background,
+    return ListenableBuilder(
+      listenable: Api.instance,
+      builder: (context, _) {
+        if (!Api.instance.isLoggedIn) return const LoginPage();
+
+        return Scaffold(
+          bottomNavigationBar: AppBottomNav(
+            currentIndex: currentPageIndex,
+            onChange: onChangeTab,
+          ),
+          body: SafeArea(child: _pages[currentPageIndex]),
+          backgroundColor: AppColors.background,
+        );
+      },
     );
   }
 }

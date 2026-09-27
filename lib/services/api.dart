@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_diet/models/user.dart';
 
 class ApiException implements Exception {
   final int statusCode;
@@ -14,8 +16,9 @@ class ApiException implements Exception {
   });
 }
 
-class Api {
+class Api extends ChangeNotifier {
   static const _baseUrl = 'http://localhost:3000';
+  static const _refreshThreshold = Duration(minutes: 2);
 
   Api._();
   static final Api instance = Api._();
@@ -25,7 +28,44 @@ class Api {
     'Accept-Language': 'pt-BR',
   };
 
+  User? user;
+  String? _refreshToken;
+  DateTime? _expiresAt;
+  Future<void>? _refreshing;
+
+  bool get isLoggedIn => user != null;
+
+  Future<void> login(String username, String password) async {
+    final data = await post('/login', {
+      'username': username,
+      'password': password,
+    });
+    _setSession(data);
+  }
+
+  Future<void> register(
+    String username,
+    String password,
+    String passwordConfirmation,
+  ) async {
+    final data = await post('/register', {
+      'username': username,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    });
+    _setSession(data);
+  }
+
+  void logout() {
+    user = null;
+    _refreshToken = null;
+    _expiresAt = null;
+    removeHeader('Authorization');
+    notifyListeners();
+  }
+
   Future<dynamic> get(String path, [Map<String, String>? query]) async {
+    await _beforeRequest();
     final res = await http.get(
       Uri.parse('$_baseUrl$path').replace(queryParameters: query),
       headers: _headers,
@@ -34,6 +74,7 @@ class Api {
   }
 
   Future<dynamic> post(String path, Map<String, dynamic> body) async {
+    await _beforeRequest();
     final res = await http.post(
       Uri.parse('$_baseUrl$path'),
       headers: _headers,
@@ -43,6 +84,7 @@ class Api {
   }
 
   Future<dynamic> put(String path, Map<String, dynamic> body) async {
+    await _beforeRequest();
     final res = await http.put(
       Uri.parse('$_baseUrl$path'),
       headers: _headers,
@@ -52,6 +94,7 @@ class Api {
   }
 
   Future<dynamic> patch(String path, Map<String, dynamic> body) async {
+    await _beforeRequest();
     final res = await http.patch(
       Uri.parse('$_baseUrl$path'),
       headers: _headers,
@@ -61,11 +104,49 @@ class Api {
   }
 
   Future<dynamic> delete(String path) async {
+    await _beforeRequest();
     final res = await http.delete(
       Uri.parse('$_baseUrl$path'),
       headers: _headers,
     );
     return _handleResponse(res);
+  }
+
+  Future<void> _beforeRequest() async {
+    final expiresAt = _expiresAt;
+    if (expiresAt == null) return;
+
+    final remaining = expiresAt.difference(DateTime.now());
+    if (remaining > _refreshThreshold) return;
+
+    final refreshing = _refreshing ??= _refresh().whenComplete(() {
+      _refreshing = null;
+    });
+
+    if (remaining <= Duration.zero) {
+      await refreshing;
+    }
+  }
+
+  Future<void> _refresh() async {
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/refresh'),
+        headers: _headers,
+        body: jsonEncode({'refresh_token': _refreshToken}),
+      );
+      _setSession(_handleResponse(res));
+    } on ApiException catch (e) {
+      if (e.statusCode == 401) logout();
+    } catch (_) {}
+  }
+
+  void _setSession(Map<String, dynamic> data) {
+    user = User.fromJson(data['user']);
+    _refreshToken = data['refresh_token'];
+    _expiresAt = DateTime.now().add(Duration(seconds: data['expires_in']));
+    setHeader('Authorization', 'Bearer ${data['access_token']}');
+    notifyListeners();
   }
 
   dynamic _handleResponse(http.Response response) {
@@ -75,10 +156,14 @@ class Api {
     if (statusCode >= 200 && statusCode < 300) {
       return body;
     } else {
+      final errors = body?['errors'] as Map<String, dynamic>? ?? {};
+
       throw ApiException(
         statusCode: statusCode,
-        message: body?['message'],
-        errors: body?['errors'] ?? {},
+        message: body?['error'],
+        errors: errors.map(
+          (field, messages) => MapEntry(field, List<String>.from(messages)),
+        ),
       );
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/input/text_input.dart';
+import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,11 +16,65 @@ class _LoginPageState extends State<LoginPage> {
   final passwordConfirmationController = TextEditingController();
 
   bool isRegister = false;
+  bool isLoading = false;
+  String? errorMessage;
+
+  static const _fieldLabels = {
+    'username': 'Usuário',
+    'password': 'Senha',
+    'password_confirmation': 'Confirmação de senha',
+  };
 
   void toggleMode() {
     setState(() {
       isRegister = !isRegister;
+      errorMessage = null;
     });
+  }
+
+  Future<void> submit() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      if (isRegister) {
+        await Api.instance.register(
+          usernameController.text.trim(),
+          passwordController.text.trim(),
+          passwordConfirmationController.text.trim(),
+        );
+      } else {
+        await Api.instance.login(
+          usernameController.text.trim(),
+          passwordController.text.trim(),
+        );
+      }
+    } on ApiException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? formatErrors(e.errors);
+      });
+    } catch (_) {
+      setState(() {
+        errorMessage = 'Não foi possível conectar ao servidor';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  String formatErrors(Map<String, List<String>> errors) {
+    return errors.entries
+        .map((entry) {
+          final label = _fieldLabels[entry.key] ?? entry.key;
+          return '$label ${entry.value.join(', ')}';
+        })
+        .join('\n');
   }
 
   @override
@@ -51,7 +106,10 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 12),
               SizedBox(
                 height: 48,
-                child: TextInput(hint: 'Usuário', controller: usernameController),
+                child: TextInput(
+                  hint: 'Usuário',
+                  controller: usernameController,
+                ),
               ),
               SizedBox(
                 height: 48,
@@ -70,10 +128,16 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: true,
                   ),
                 ),
+              if (errorMessage != null)
+                Text(
+                  errorMessage!,
+                  textAlign: .center,
+                  style: TextStyle(color: Colors.red.shade300),
+                ),
               SizedBox(
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: isLoading ? null : submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade800,
                     foregroundColor: Colors.grey.shade200,
@@ -81,13 +145,22 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(isRegister ? 'Cadastrar' : 'Entrar'),
+                  child: isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.grey.shade200,
+                          ),
+                        )
+                      : Text(isRegister ? 'Cadastrar' : 'Entrar'),
                 ),
               ),
               SizedBox(
                 height: 48,
                 child: OutlinedButton(
-                  onPressed: toggleMode,
+                  onPressed: isLoading ? null : toggleMode,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.blue.shade300,
                     side: BorderSide(color: Colors.blue.shade800),
