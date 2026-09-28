@@ -60,10 +60,7 @@ class Api extends ChangeNotifier {
 
   Future<void> _syncUser() async {
     try {
-      final data = await get('/users/me');
-      user = User.fromJson(data);
-      _storage.write(key: 'user', value: jsonEncode(data));
-      notifyListeners();
+      _setUser(await get('/users/me'));
     } catch (_) {}
   }
 
@@ -82,6 +79,34 @@ class Api extends ChangeNotifier {
   ) async {
     final data = await post('/register', {
       'username': username,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    });
+    _setSession(data);
+  }
+
+  Future<void> updateGoals({
+    required int kcal,
+    required int protein,
+    required int carbohydrate,
+    required int fat,
+  }) async {
+    final data = await patch('/users/me', {
+      'kcal_goal': kcal,
+      'protein_goal': protein,
+      'carbohydrate_goal': carbohydrate,
+      'fat_goal': fat,
+    });
+    _setUser(data);
+  }
+
+  Future<void> changePassword(
+    String currentPassword,
+    String password,
+    String passwordConfirmation,
+  ) async {
+    final data = await patch('/users/me/password', {
+      'current_password': currentPassword,
       'password': password,
       'password_confirmation': passwordConfirmation,
     });
@@ -181,6 +206,12 @@ class Api extends ChangeNotifier {
     _storage.write(key: 'access_token', value: data['access_token']);
     _storage.write(key: 'refresh_token', value: _refreshToken);
     _storage.write(key: 'expires_at', value: _expiresAt!.toIso8601String());
+    notifyListeners();
+  }
+
+  void _setUser(Map<String, dynamic> data) {
+    user = User.fromJson(data);
+    _storage.write(key: 'user', value: jsonEncode(data));
     notifyListeners();
   }
 

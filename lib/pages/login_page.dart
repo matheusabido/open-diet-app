@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/input/text_input.dart';
+import 'package:open_diet/components/primary_button.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
+import 'package:open_diet/utils/errors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -53,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } on ApiException catch (e) {
       setState(() {
-        errorMessage = e.message ?? formatErrors(e.errors);
+        errorMessage = e.message ?? formatErrors(e.errors, _fieldLabels);
       });
     } catch (_) {
       setState(() {
@@ -66,15 +68,6 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     }
-  }
-
-  String formatErrors(Map<String, List<String>> errors) {
-    return errors.entries
-        .map((entry) {
-          final label = _fieldLabels[entry.key] ?? entry.key;
-          return '$label ${entry.value.join(', ')}';
-        })
-        .join('\n');
   }
 
   @override
@@ -107,14 +100,14 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 48,
                 child: TextInput(
-                  hint: 'Usuário',
+                  label: 'Usuário *',
                   controller: usernameController,
                 ),
               ),
               SizedBox(
                 height: 48,
                 child: TextInput(
-                  hint: 'Senha',
+                  label: 'Senha *',
                   controller: passwordController,
                   obscureText: true,
                 ),
@@ -123,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   height: 48,
                   child: TextInput(
-                    hint: 'Confirmar senha',
+                    label: 'Confirmar senha *',
                     controller: passwordConfirmationController,
                     obscureText: true,
                   ),
@@ -134,28 +127,10 @@ class _LoginPageState extends State<LoginPage> {
                   textAlign: .center,
                   style: TextStyle(color: Colors.red.shade300),
                 ),
-              SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade800,
-                    foregroundColor: Colors.grey.shade200,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: isLoading
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.grey.shade200,
-                          ),
-                        )
-                      : Text(isRegister ? 'Cadastrar' : 'Entrar'),
-                ),
+              PrimaryButton(
+                label: isRegister ? 'Cadastrar' : 'Entrar',
+                onPressed: submit,
+                isLoading: isLoading,
               ),
               SizedBox(
                 height: 48,

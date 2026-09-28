@@ -137,7 +137,7 @@ class _FoodsPageState extends State<FoodsPage> {
                 child: SizedBox(
                   height: 48,
                   child: TextInput(
-                    hint: 'Pesquisar por nome...',
+                    label: 'Pesquisar por nome',
                     controller: controller,
                     onChanged: onSearch,
                   ),

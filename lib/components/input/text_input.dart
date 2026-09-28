@@ -5,14 +5,14 @@ class TextInput extends StatelessWidget {
   const TextInput({
     super.key,
     this.controller,
-    this.hint,
+    this.label,
     this.obscureText = false,
     this.keyboardType,
     this.onChanged,
   });
 
   final TextEditingController? controller;
-  final String? hint;
+  final String? label;
   final bool obscureText;
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
@@ -26,7 +26,7 @@ class TextInput extends StatelessWidget {
 
     return TextField(
       decoration: InputDecoration(
-        hintText: hint,
+        labelText: label,
 
         enabledBorder: border,
         focusedBorder: border,
@@ -36,7 +36,8 @@ class TextInput extends StatelessWidget {
         filled: true,
         fillColor: AppColors.container,
 
-        hintStyle: TextStyle(color: Colors.grey.shade500),
+        labelStyle: TextStyle(color: Colors.grey.shade500),
+        floatingLabelStyle: TextStyle(color: AppColors.textSecondary),
       ),
       style: TextStyle(color: Colors.grey.shade200),
       controller: controller,

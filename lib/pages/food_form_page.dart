@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/input/number_input.dart';
 import 'package:open_diet/components/input/text_input.dart';
+import 'package:open_diet/components/primary_button.dart';
 import 'package:open_diet/components/input/unit_select.dart';
 import 'package:open_diet/models/food.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
+import 'package:open_diet/utils/errors.dart';
 import 'package:open_diet/utils/numbers.dart';
 
 class FoodFormPage extends StatefulWidget {
@@ -68,7 +70,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
     };
     if (errors.isNotEmpty) {
       setState(() {
-        errorMessage = formatErrors(errors);
+        errorMessage = formatErrors(errors, _fieldLabels);
       });
       return;
     }
@@ -99,7 +101,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
       if (mounted) Navigator.of(context).pop(Food.fromJson(data));
     } on ApiException catch (e) {
       setState(() {
-        errorMessage = e.message ?? formatErrors(e.errors);
+        errorMessage = e.message ?? formatErrors(e.errors, _fieldLabels);
       });
     } catch (_) {
       setState(() {
@@ -112,15 +114,6 @@ class _FoodFormPageState extends State<FoodFormPage> {
         });
       }
     }
-  }
-
-  String formatErrors(Map<String, List<String>> errors) {
-    return errors.entries
-        .map((entry) {
-          final label = _fieldLabels[entry.key] ?? entry.key;
-          return '$label ${entry.value.join(', ')}';
-        })
-        .join('\n');
   }
 
   @override
@@ -142,11 +135,11 @@ class _FoodFormPageState extends State<FoodFormPage> {
               children: [
                 SizedBox(
                   height: 48,
-                  child: TextInput(hint: 'Nome *', controller: nameController),
+                  child: TextInput(label: 'Nome *', controller: nameController),
                 ),
                 SizedBox(
                   height: 48,
-                  child: TextInput(hint: 'Marca', controller: brandController),
+                  child: TextInput(label: 'Marca', controller: brandController),
                 ),
                 SizedBox(height: 4),
                 Text(
@@ -160,7 +153,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                       child: SizedBox(
                         height: 48,
                         child: NumberInput(
-                          hint: 'Porção *',
+                          label: 'Porção *',
                           controller: amountController,
                         ),
                       ),
@@ -177,28 +170,28 @@ class _FoodFormPageState extends State<FoodFormPage> {
                 SizedBox(
                   height: 48,
                   child: NumberInput(
-                    hint: 'Calorias (kcal) *',
+                    label: 'Calorias (kcal) *',
                     controller: kcalController,
                   ),
                 ),
                 SizedBox(
                   height: 48,
                   child: NumberInput(
-                    hint: 'Proteína (g) *',
+                    label: 'Proteína (g) *',
                     controller: proteinController,
                   ),
                 ),
                 SizedBox(
                   height: 48,
                   child: NumberInput(
-                    hint: 'Carboidrato (g) *',
+                    label: 'Carboidrato (g) *',
                     controller: carbohydrateController,
                   ),
                 ),
                 SizedBox(
                   height: 48,
                   child: NumberInput(
-                    hint: 'Gordura (g) *',
+                    label: 'Gordura (g) *',
                     controller: fatController,
                   ),
                 ),
@@ -208,28 +201,10 @@ class _FoodFormPageState extends State<FoodFormPage> {
                     textAlign: .center,
                     style: TextStyle(color: Colors.red.shade300),
                   ),
-                SizedBox(
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade800,
-                      foregroundColor: Colors.grey.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: isLoading
-                        ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.grey.shade200,
-                            ),
-                          )
-                        : Text('Salvar'),
-                  ),
+                PrimaryButton(
+                  label: 'Salvar',
+                  onPressed: submit,
+                  isLoading: isLoading,
                 ),
               ],
             ),
