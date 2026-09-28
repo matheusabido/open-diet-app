@@ -8,6 +8,8 @@ class User {
   final int carbohydrateGoal;
   final int fatGoal;
 
+  bool get isAdmin => role == 'admin';
+
   User({
     required this.id,
     required this.username,

@@ -5,24 +5,29 @@ import 'package:open_diet/components/input/unit_select.dart';
 import 'package:open_diet/models/food.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
+import 'package:open_diet/utils/numbers.dart';
 
 class FoodFormPage extends StatefulWidget {
-  const FoodFormPage({super.key});
+  const FoodFormPage({super.key, this.food});
+
+  final Food? food;
 
   @override
   State<FoodFormPage> createState() => _FoodFormPageState();
 }
 
 class _FoodFormPageState extends State<FoodFormPage> {
-  final nameController = TextEditingController();
-  final brandController = TextEditingController();
-  final amountController = TextEditingController(text: '100');
-  final kcalController = TextEditingController();
-  final proteinController = TextEditingController();
-  final carbohydrateController = TextEditingController();
-  final fatController = TextEditingController();
+  late final nameController = TextEditingController(text: widget.food?.name);
+  late final brandController = TextEditingController(text: widget.food?.brand);
+  late final amountController = numberController(widget.food?.amount ?? 100);
+  late final kcalController = numberController(widget.food?.kcal);
+  late final proteinController = numberController(widget.food?.protein);
+  late final carbohydrateController = numberController(
+    widget.food?.carbohydrate,
+  );
+  late final fatController = numberController(widget.food?.fat);
 
-  String unit = 'g';
+  late String unit = widget.food?.unit ?? 'g';
   bool isLoading = false;
   String? errorMessage;
 
@@ -36,6 +41,12 @@ class _FoodFormPageState extends State<FoodFormPage> {
     'carbohydrate': 'Carboidrato',
     'fat': 'Gordura',
   };
+
+  TextEditingController numberController(double? value) {
+    return TextEditingController(
+      text: value == null ? null : formatAmount(value),
+    );
+  }
 
   double? parseNumber(TextEditingController controller) {
     return double.tryParse(controller.text.trim().replaceAll(',', '.'));
@@ -68,9 +79,10 @@ class _FoodFormPageState extends State<FoodFormPage> {
     });
 
     final brand = brandController.text.trim();
+    final food = widget.food;
 
     try {
-      final data = await Api.instance.post('/foods', {
+      final body = {
         'name': nameController.text.trim(),
         'brand': brand.isEmpty ? null : brand,
         'amount': parseNumber(amountController),
@@ -79,7 +91,10 @@ class _FoodFormPageState extends State<FoodFormPage> {
         'protein': parseNumber(proteinController),
         'carbohydrate': parseNumber(carbohydrateController),
         'fat': parseNumber(fatController),
-      });
+      };
+      final data = food == null
+          ? await Api.instance.post('/foods', body)
+          : await Api.instance.put('/foods/${food.id}', body);
 
       if (mounted) Navigator.of(context).pop(Food.fromJson(data));
     } on ApiException catch (e) {
@@ -113,7 +128,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Novo alimento'),
+        title: Text(widget.food == null ? 'Novo alimento' : 'Editar alimento'),
         backgroundColor: AppColors.background,
         foregroundColor: Colors.grey.shade200,
       ),

@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:open_diet/components/food_item.dart';
+import 'package:open_diet/components/food_card.dart';
 import 'package:open_diet/components/food_list_footer.dart';
 import 'package:open_diet/components/input/text_input.dart';
 import 'package:open_diet/models/food.dart';
+import 'package:open_diet/pages/food_detail_page.dart';
 import 'package:open_diet/pages/food_form_page.dart';
 import 'package:open_diet/services/api.dart';
 
@@ -98,6 +99,30 @@ class _FoodsPageState extends State<FoodsPage> {
     if (food != null) loadFoods(reset: true);
   }
 
+  void openDetail(Food food) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => FoodDetailPage(
+          food: food,
+          onUpdated: onFoodUpdated,
+          onDeleted: () => onFoodDeleted(food),
+        ),
+      ),
+    );
+  }
+
+  void onFoodUpdated(Food updated) {
+    setState(() {
+      foods = [for (final f in foods) f.id == updated.id ? updated : f];
+    });
+  }
+
+  void onFoodDeleted(Food deleted) {
+    setState(() {
+      foods = foods.where((f) => f.id != deleted.id).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -153,12 +178,7 @@ class _FoodsPageState extends State<FoodsPage> {
                   }
 
                   final food = foods[index];
-                  return FoodItem(
-                    name: food.name,
-                    kcal: food.kcal,
-                    amount: food.amount,
-                    unit: food.unit,
-                  );
+                  return FoodCard(food: food, onTap: () => openDetail(food));
                 },
               ),
             ),

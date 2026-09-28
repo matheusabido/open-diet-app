@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_diet/components/error_state.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class FoodListFooter extends StatelessWidget {
@@ -25,12 +26,7 @@ class FoodListFooter extends StatelessWidget {
     }
 
     if (errorMessage != null) {
-      return Column(
-        children: [
-          Text(errorMessage!, style: TextStyle(color: Colors.red.shade300)),
-          TextButton(onPressed: onRetry, child: Text('Tentar novamente')),
-        ],
-      );
+      return ErrorState(message: errorMessage!, onRetry: onRetry);
     }
 
     if (isEmpty) {

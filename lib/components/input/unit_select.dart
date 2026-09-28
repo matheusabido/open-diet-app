@@ -7,7 +7,7 @@ class UnitSelect extends StatelessWidget {
   final String value;
   final ValueChanged<String> onChanged;
 
-  static const _units = ['g', 'kg', 'mg', 'oz', 'lb', 'ml', 'L', 'dL'];
+  static const _units = ['g', 'kg', 'mg', 'oz', 'lb', 'ml', 'L', 'dL', 'un'];
 
   @override
   Widget build(BuildContext context) {
