@@ -7,7 +7,9 @@ import 'package:open_diet/pages/profile_page.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Api.instance.restoreSession();
   runApp(const OpenDietApp());
 }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_diet/models/user.dart';
 
@@ -19,6 +20,7 @@ class ApiException implements Exception {
 class Api extends ChangeNotifier {
   static const _baseUrl = 'http://localhost:3000';
   static const _refreshThreshold = Duration(minutes: 2);
+  static const _storage = FlutterSecureStorage();
 
   Api._();
   static final Api instance = Api._();
@@ -34,6 +36,38 @@ class Api extends ChangeNotifier {
   Future<void>? _refreshing;
 
   bool get isLoggedIn => user != null;
+
+  Future<void> restoreSession() async {
+    final session = await _storage.readAll();
+    final userJson = session['user'];
+    final accessToken = session['access_token'];
+    final refreshToken = session['refresh_token'];
+    final expiresAt = session['expires_at'];
+    if (userJson == null ||
+        accessToken == null ||
+        refreshToken == null ||
+        expiresAt == null) {
+      return;
+    }
+
+    user = User.fromJson(jsonDecode(userJson));
+    _refreshToken = refreshToken;
+    _expiresAt = DateTime.parse(expiresAt);
+    setHeader('Authorization', 'Bearer $accessToken');
+
+    _syncUser();
+  }
+
+  Future<void> _syncUser() async {
+    try {
+      final data = await get('/users/me');
+      user = User.fromJson(data);
+      _storage.write(key: 'user', value: jsonEncode(data));
+      notifyListeners();
+    } on ApiException catch (e) {
+      if (e.statusCode == 401) logout();
+    } catch (_) {}
+  }
 
   Future<void> login(String username, String password) async {
     final data = await post('/login', {
@@ -61,6 +95,7 @@ class Api extends ChangeNotifier {
     _refreshToken = null;
     _expiresAt = null;
     removeHeader('Authorization');
+    _storage.deleteAll();
     notifyListeners();
   }
 
@@ -146,6 +181,10 @@ class Api extends ChangeNotifier {
     _refreshToken = data['refresh_token'];
     _expiresAt = DateTime.now().add(Duration(seconds: data['expires_in']));
     setHeader('Authorization', 'Bearer ${data['access_token']}');
+    _storage.write(key: 'user', value: jsonEncode(data['user']));
+    _storage.write(key: 'access_token', value: data['access_token']);
+    _storage.write(key: 'refresh_token', value: _refreshToken);
+    _storage.write(key: 'expires_at', value: _expiresAt!.toIso8601String());
     notifyListeners();
   }
 
