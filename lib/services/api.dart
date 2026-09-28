@@ -64,8 +64,6 @@ class Api extends ChangeNotifier {
       user = User.fromJson(data);
       _storage.write(key: 'user', value: jsonEncode(data));
       notifyListeners();
-    } on ApiException catch (e) {
-      if (e.statusCode == 401) logout();
     } catch (_) {}
   }
 
@@ -171,8 +169,6 @@ class Api extends ChangeNotifier {
         body: jsonEncode({'refresh_token': _refreshToken}),
       );
       _setSession(_handleResponse(res));
-    } on ApiException catch (e) {
-      if (e.statusCode == 401) logout();
     } catch (_) {}
   }
 
@@ -191,6 +187,8 @@ class Api extends ChangeNotifier {
   dynamic _handleResponse(http.Response response) {
     final statusCode = response.statusCode;
     final body = response.body.isNotEmpty ? jsonDecode(response.body) : null;
+
+    if (statusCode == 401 && isLoggedIn) logout();
 
     if (statusCode >= 200 && statusCode < 300) {
       return body;
