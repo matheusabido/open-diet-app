@@ -63,22 +63,39 @@ class StatsCardState extends State<StatsCard> {
                   mainAxisSize: .min,
                   spacing: 16,
                   children: [
-                    NutritionProgressBar(currentAmount: widget.proteinGrams, goalAmount: widget.proteinGoal, color: Colors.red),
-                    NutritionProgressBar(currentAmount: widget.carbohydrateGrams, goalAmount: widget.carbohydrateGoal, color: Colors.blue),
-                    NutritionProgressBar(currentAmount: widget.fatGrams, goalAmount: widget.fatGoal, color: Colors.amber),
+                    NutritionProgressBar(
+                      currentAmount: widget.proteinGrams,
+                      goalAmount: widget.proteinGoal,
+                      color: Colors.red,
+                    ),
+                    NutritionProgressBar(
+                      currentAmount: widget.carbohydrateGrams,
+                      goalAmount: widget.carbohydrateGoal,
+                      color: Colors.blue,
+                    ),
+                    NutritionProgressBar(
+                      currentAmount: widget.fatGrams,
+                      goalAmount: widget.fatGoal,
+                      color: Colors.amber,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ],
-      )
+      ),
     );
   }
 }
 
 class NutritionProgressBar extends StatefulWidget {
-  const NutritionProgressBar({super.key, required this.currentAmount, required this.goalAmount, required this.color});
+  const NutritionProgressBar({
+    super.key,
+    required this.currentAmount,
+    required this.goalAmount,
+    required this.color,
+  });
 
   final double currentAmount;
   final double goalAmount;
@@ -94,12 +111,7 @@ class NutritionProgressBarState extends State<NutritionProgressBar> {
     const textStyle = TextStyle(
       color: Color.fromARGB(255, 227, 227, 227),
       fontSize: 13,
-      shadows: [
-        Shadow(
-          blurRadius: 3,
-          offset: Offset(0, 1)
-        ),
-      ],
+      shadows: [Shadow(blurRadius: 3, offset: Offset(0, 1))],
     );
 
     return Row(
@@ -115,11 +127,8 @@ class NutritionProgressBarState extends State<NutritionProgressBar> {
         ),
         SizedBox(
           width: 32,
-          child: Text(
-            "${widget.goalAmount.round()}g",
-            style: textStyle,
-          ),
-        )
+          child: Text("${widget.goalAmount.round()}g", style: textStyle),
+        ),
       ],
     );
   }

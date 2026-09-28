@@ -6,9 +6,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        Text("Profile Page!", style: TextStyle(color: Colors.white))
-      ],
+      children: [Text("Profile Page!", style: TextStyle(color: Colors.white))],
     );
   }
 }

@@ -7,11 +7,15 @@ class TextInput extends StatelessWidget {
     this.controller,
     this.hint,
     this.obscureText = false,
+    this.keyboardType,
+    this.onChanged,
   });
 
   final TextEditingController? controller;
   final String? hint;
   final bool obscureText;
+  final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +41,8 @@ class TextInput extends StatelessWidget {
       style: TextStyle(color: Colors.grey.shade200),
       controller: controller,
       obscureText: obscureText,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
     );
   }
 }

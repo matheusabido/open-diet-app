@@ -3,7 +3,13 @@ import 'package:open_diet/theme/colors.dart';
 import 'package:open_diet/utils/numbers.dart';
 
 class FoodItem extends StatefulWidget {
-  const FoodItem({super.key, required this.name, required this.kcal, required this.amount, required this.unit});
+  const FoodItem({
+    super.key,
+    required this.name,
+    required this.kcal,
+    required this.amount,
+    required this.unit,
+  });
 
   final String name;
   final double kcal;
@@ -18,20 +24,16 @@ class FoodItem extends StatefulWidget {
 class FoodItemState extends State<FoodItem> {
   @override
   Widget build(BuildContext context) {
-    const nameTextStyle = TextStyle(
-      color: Colors.white,
-    );
+    const nameTextStyle = TextStyle(color: Colors.white);
 
-    const amountTextStyle = TextStyle(
-      color: Colors.white54,
-    );
+    const amountTextStyle = TextStyle(color: Colors.white54);
 
     return Material(
       color: Colors.transparent,
       child: Ink(
         decoration: BoxDecoration(
           color: AppColors.container2,
-          borderRadius: .circular(8)
+          borderRadius: .circular(8),
         ),
         child: InkWell(
           onTap: () => print(widget.name),
@@ -47,7 +49,10 @@ class FoodItemState extends State<FoodItem> {
                     children: [
                       Text(widget.name, style: nameTextStyle),
                       Text("·", style: amountTextStyle),
-                      Text("${formatAmount(widget.amount)} ${widget.unit}", style: amountTextStyle),
+                      Text(
+                        "${formatAmount(widget.amount)} ${widget.unit}",
+                        style: amountTextStyle,
+                      ),
                     ],
                   ),
                 ),

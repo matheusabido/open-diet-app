@@ -1,5 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:open_diet/components/food_item.dart';
+import 'package:open_diet/components/food_list_footer.dart';
 import 'package:open_diet/components/input/text_input.dart';
+import 'package:open_diet/models/food.dart';
+import 'package:open_diet/pages/food_form_page.dart';
+import 'package:open_diet/services/api.dart';
 
 class FoodsPage extends StatefulWidget {
   const FoodsPage({super.key});
@@ -10,12 +17,93 @@ class FoodsPage extends StatefulWidget {
 
 class _FoodsPageState extends State<FoodsPage> {
   final controller = TextEditingController();
+  final scrollController = ScrollController();
+
+  static const _pageSize = 20;
+
+  List<Food> foods = [];
+  bool isLoading = false;
+  bool hasMore = true;
+  String? errorMessage;
+
+  Timer? _debounce;
+  int _request = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController.addListener(onScroll);
+    loadFoods(reset: true);
+  }
+
+  Future<void> loadFoods({bool reset = false}) async {
+    final request = ++_request;
+
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+      if (reset) {
+        foods = [];
+        hasMore = true;
+      }
+    });
+
+    String? error;
+    try {
+      final data = await Api.instance.get('/foods', {
+        'search': controller.text.trim(),
+        if (foods.isNotEmpty) 'after': '${foods.last.id}',
+      });
+      if (request != _request || !mounted) return;
+
+      final page = (data as List? ?? [])
+          .map((json) => Food.fromJson(json))
+          .toList();
+
+      setState(() {
+        foods = [...foods, ...page];
+        hasMore = page.length == _pageSize;
+      });
+    } on ApiException catch (e) {
+      error = e.message ?? 'Não foi possível carregar os alimentos';
+    } catch (_) {
+      error = 'Não foi possível conectar ao servidor';
+    } finally {
+      if (request == _request && mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = error;
+        });
+      }
+    }
+  }
+
+  void onScroll() {
+    final position = scrollController.position;
+    if (position.pixels < position.maxScrollExtent - 200) return;
+    if (isLoading || !hasMore || errorMessage != null) return;
+    loadFoods();
+  }
+
+  void onSearch(String _) {
+    _debounce?.cancel();
+    _debounce = Timer(Duration(milliseconds: 400), () {
+      loadFoods(reset: true);
+    });
+  }
+
+  Future<void> openForm() async {
+    final food = await Navigator.of(context)
+        .push<Food>(MaterialPageRoute(builder: (_) => const FoodFormPage()));
+    if (food != null) loadFoods(reset: true);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: .all(16),
       child: Column(
+        spacing: 16,
         children: [
           Row(
             spacing: 8,
@@ -26,6 +114,7 @@ class _FoodsPageState extends State<FoodsPage> {
                   child: TextInput(
                     hint: 'Pesquisar por nome...',
                     controller: controller,
+                    onChanged: onSearch,
                   ),
                 ),
               ),
@@ -33,7 +122,7 @@ class _FoodsPageState extends State<FoodsPage> {
                 width: 48,
                 height: 48,
                 child: IconButton(
-                  onPressed: () => print(controller.text),
+                  onPressed: openForm,
                   icon: Icon(Icons.add, color: Colors.grey.shade300),
                   style: IconButton.styleFrom(
                     backgroundColor: Colors.blue.shade800,
@@ -45,6 +134,35 @@ class _FoodsPageState extends State<FoodsPage> {
               ),
             ],
           ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => loadFoods(reset: true),
+              child: ListView.separated(
+                controller: scrollController,
+                physics: AlwaysScrollableScrollPhysics(),
+                itemCount: foods.length + 1,
+                separatorBuilder: (_, _) => SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  if (index == foods.length) {
+                    return FoodListFooter(
+                      isLoading: isLoading,
+                      isEmpty: foods.isEmpty,
+                      errorMessage: errorMessage,
+                      onRetry: loadFoods,
+                    );
+                  }
+
+                  final food = foods[index];
+                  return FoodItem(
+                    name: food.name,
+                    kcal: food.kcal,
+                    amount: food.amount,
+                    unit: food.unit,
+                  );
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -52,6 +170,8 @@ class _FoodsPageState extends State<FoodsPage> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
+    scrollController.dispose();
     controller.dispose();
     super.dispose();
   }

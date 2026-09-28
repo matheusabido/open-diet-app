@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class AppBottomNav extends StatefulWidget {
-  const AppBottomNav({super.key, required this.currentIndex, required this.onChange});
+  const AppBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onChange,
+  });
 
   final int currentIndex;
   final Function(int) onChange;
@@ -16,7 +20,7 @@ class AppBottomNavState extends State<AppBottomNav> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       backgroundColor: AppColors.container,
-      
+
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white70,
 
@@ -27,18 +31,12 @@ class AppBottomNavState extends State<AppBottomNav> {
       onTap: widget.onChange,
 
       items: const [
-        BottomNavigationBarItem(
-          label: "Cadastros",
-          icon: Icon(Icons.add),
-        ),
+        BottomNavigationBarItem(label: "Cadastros", icon: Icon(Icons.add)),
         BottomNavigationBarItem(
           icon: Icon(Icons.restaurant_menu),
           label: "Refeições",
         ),
-        BottomNavigationBarItem(
-          label: "Perfil",
-          icon: Icon(Icons.person),
-        ),
+        BottomNavigationBarItem(label: "Perfil", icon: Icon(Icons.person)),
       ],
     );
   }

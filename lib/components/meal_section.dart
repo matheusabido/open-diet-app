@@ -15,9 +15,7 @@ class MealSection extends StatefulWidget {
 class MealSectionState extends State<MealSection> {
   @override
   Widget build(BuildContext context) {
-    const amountTextStyle = TextStyle(
-      color: Colors.white70,
-    );
+    const amountTextStyle = TextStyle(color: Colors.white70);
 
     return Container(
       decoration: BoxDecoration(
@@ -57,13 +55,8 @@ class MealSectionState extends State<MealSection> {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                onPressed: () => {
-                  print(widget.title)
-                },
-                icon: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
+                onPressed: () => {print(widget.title)},
+                icon: const Icon(Icons.add, color: Colors.white),
               ),
             ],
           ),

@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class NutritionChart extends StatefulWidget {
-  const NutritionChart({super.key, required this.proteinGrams, required this.carbohydrateGrams, required this.fatGrams, required this.kcalRemaining, required this.size});
+  const NutritionChart({
+    super.key,
+    required this.proteinGrams,
+    required this.carbohydrateGrams,
+    required this.fatGrams,
+    required this.kcalRemaining,
+    required this.size,
+  });
 
   final double proteinGrams;
   final double carbohydrateGrams;
@@ -17,12 +24,7 @@ class NutritionChart extends StatefulWidget {
 class NutritionChartState extends State<NutritionChart> {
   @override
   Widget build(BuildContext context) {
-    const shadows = <Shadow>[
-      Shadow(
-          offset: Offset(0, 1),
-          blurRadius: 5,
-        )
-    ];
+    const shadows = <Shadow>[Shadow(offset: Offset(0, 1), blurRadius: 5)];
 
     const textStyle = TextStyle(
       fontSize: 12,
@@ -77,8 +79,8 @@ class NutritionChartState extends State<NutritionChart> {
                   title: "${widget.fatGrams.round()}g",
                   radius: sectionRadius,
                   titleStyle: textStyle,
-                )
-              ]
+                ),
+              ],
             ),
             duration: Duration(milliseconds: 150),
             curve: Curves.linear,
@@ -86,18 +88,18 @@ class NutritionChartState extends State<NutritionChart> {
           Column(
             mainAxisAlignment: .center,
             children: [
-              Text(widget.kcalRemaining.round().toString(), style: kcalTextStyle),
+              Text(
+                widget.kcalRemaining.round().toString(),
+                style: kcalTextStyle,
+              ),
               Transform.translate(
                 offset: const Offset(0, -4),
-                child: Text(
-                  "kcal restantes",
-                  style: kcalSubtextStyle,
-                ),
+                child: Text("kcal restantes", style: kcalSubtextStyle),
               ),
             ],
           ),
         ],
-      )
+      ),
     );
   }
 }
