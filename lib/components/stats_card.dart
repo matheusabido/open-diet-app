@@ -7,6 +7,8 @@ import 'package:open_diet/theme/colors.dart';
 class StatsCard extends StatefulWidget {
   const StatsCard({
     super.key,
+    required this.kcal,
+    required this.kcalGoal,
     required this.proteinGrams,
     required this.carbohydrateGrams,
     required this.fatGrams,
@@ -14,6 +16,9 @@ class StatsCard extends StatefulWidget {
     required this.carbohydrateGoal,
     required this.fatGoal,
   });
+
+  final double kcal;
+  final double kcalGoal;
 
   final double proteinGrams;
   final double carbohydrateGrams;
@@ -54,7 +59,7 @@ class StatsCardState extends State<StatsCard> {
                 proteinGrams: widget.proteinGrams,
                 carbohydrateGrams: widget.carbohydrateGrams,
                 fatGrams: widget.fatGrams,
-                kcalRemaining: 1234,
+                kcalRemaining: widget.kcalGoal - widget.kcal,
                 size: 130,
               ),
 
@@ -119,7 +124,9 @@ class NutritionProgressBarState extends State<NutritionProgressBar> {
       children: [
         Expanded(
           child: LinearProgressIndicator(
-            value: min(widget.currentAmount / widget.goalAmount, 1),
+            value: widget.goalAmount > 0
+                ? min(widget.currentAmount / widget.goalAmount, 1)
+                : 0,
             color: widget.color,
             borderRadius: .circular(8),
             minHeight: 6,
