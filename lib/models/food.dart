@@ -1,3 +1,5 @@
+import 'package:open_diet/utils/units.dart';
+
 class Food {
   final int id;
   final String name;
@@ -35,5 +37,23 @@ class Food {
       amount: (json['amount'] as num).toDouble(),
       unit: json['unit'],
     );
+  }
+
+  double portion(double amount, String unit) {
+    return convertUnit(amount, unit, this.unit) / this.amount;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'brand': brand,
+      'kcal': kcal,
+      'protein': protein,
+      'carbohydrate': carbohydrate,
+      'fat': fat,
+      'amount': amount,
+      'unit': unit,
+    };
   }
 }

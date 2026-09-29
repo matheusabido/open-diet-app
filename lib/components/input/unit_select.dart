@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:open_diet/theme/colors.dart';
 
 class UnitSelect extends StatelessWidget {
-  const UnitSelect({super.key, required this.value, required this.onChanged});
+  const UnitSelect({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    this.units = allUnits,
+  });
 
   final String value;
   final ValueChanged<String> onChanged;
+  final List<String> units;
 
-  static const _units = ['g', 'kg', 'mg', 'oz', 'lb', 'ml', 'L', 'dL', 'un'];
+  static const allUnits = ['g', 'kg', 'mg', 'oz', 'lb', 'ml', 'L', 'dL', 'un'];
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +29,7 @@ class UnitSelect extends StatelessWidget {
           value: value,
           dropdownColor: AppColors.container2,
           style: TextStyle(color: Colors.grey.shade200),
-          items: _units
+          items: units
               .map((u) => DropdownMenuItem(value: u, child: Text(u)))
               .toList(),
           onChanged: (value) {

@@ -5,12 +5,16 @@ import 'package:open_diet/components/food_card.dart';
 import 'package:open_diet/components/food_list_footer.dart';
 import 'package:open_diet/components/input/text_input.dart';
 import 'package:open_diet/models/food.dart';
+import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/pages/food_detail_page.dart';
 import 'package:open_diet/pages/food_form_page.dart';
+import 'package:open_diet/pages/food_item_form_page.dart';
 import 'package:open_diet/services/api.dart';
 
 class FoodsPage extends StatefulWidget {
-  const FoodsPage({super.key});
+  const FoodsPage({super.key, this.meal});
+
+  final String? meal;
 
   @override
   State<FoodsPage> createState() => _FoodsPageState();
@@ -111,6 +115,19 @@ class _FoodsPageState extends State<FoodsPage> {
     );
   }
 
+  Future<void> selectFood(Food food) async {
+    final draft = await Navigator.of(context).push<FoodItemDraft>(
+      MaterialPageRoute(
+        builder: (_) => FoodItemFormPage(food: food, meal: widget.meal),
+      ),
+    );
+    if (draft != null && mounted) Navigator.of(context).pop(draft);
+  }
+
+  void onFoodTap(Food food) {
+    widget.meal == null ? openDetail(food) : selectFood(food);
+  }
+
   void onFoodUpdated(Food updated) {
     setState(() {
       foods = [for (final f in foods) f.id == updated.id ? updated : f];
@@ -178,7 +195,7 @@ class _FoodsPageState extends State<FoodsPage> {
                   }
 
                   final food = foods[index];
-                  return FoodCard(food: food, onTap: () => openDetail(food));
+                  return FoodCard(food: food, onTap: () => onFoodTap(food));
                 },
               ),
             ),

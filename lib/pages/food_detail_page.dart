@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/confirm_dialog.dart';
 import 'package:open_diet/components/nutrient_row.dart';
+import 'package:open_diet/components/primary_button.dart';
 import 'package:open_diet/models/food.dart';
+import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/pages/food_form_page.dart';
+import 'package:open_diet/pages/food_item_form_page.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
+import 'package:open_diet/utils/food_items.dart';
 import 'package:open_diet/utils/numbers.dart';
+import 'package:open_diet/utils/toast.dart';
 
 class FoodDetailPage extends StatefulWidget {
   const FoodDetailPage({
@@ -38,6 +43,16 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       food = updated;
     });
     widget.onUpdated(updated);
+  }
+
+  Future<void> addToMeal() async {
+    final draft = await Navigator.of(context).push<FoodItemDraft>(
+      MaterialPageRoute(builder: (_) => FoodItemFormPage(food: food)),
+    );
+    if (draft == null || !mounted) return;
+
+    showToast(context, 'Adicionado em ${mealNames[draft.meal]}');
+    addFoodItem(context, draft);
   }
 
   Future<void> delete() async {
@@ -142,6 +157,11 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                   value: food.fat,
                   unit: 'g',
                   color: Colors.amber,
+                ),
+                SizedBox(height: 8),
+                PrimaryButton(
+                  label: 'Adicionar à refeição',
+                  onPressed: addToMeal,
                 ),
                 if (errorMessage != null)
                   Text(

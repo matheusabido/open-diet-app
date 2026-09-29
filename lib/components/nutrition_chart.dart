@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -16,6 +18,8 @@ class NutritionChart extends StatefulWidget {
   final double fatGrams;
   final double kcalRemaining;
   final double size;
+
+  static const minValue = 0.1;
 
   @override
   State<StatefulWidget> createState() => NutritionChartState();
@@ -60,21 +64,21 @@ class NutritionChartState extends State<NutritionChart> {
               sectionsSpace: 0,
               sections: [
                 PieChartSectionData(
-                  value: widget.proteinGrams,
+                  value: max(widget.proteinGrams, NutritionChart.minValue),
                   color: Colors.red,
                   title: "${widget.proteinGrams.round()}g",
                   titleStyle: textStyle,
                   radius: sectionRadius,
                 ),
                 PieChartSectionData(
-                  value: widget.carbohydrateGrams,
+                  value: max(widget.carbohydrateGrams, NutritionChart.minValue),
                   color: Colors.blue,
                   title: "${widget.carbohydrateGrams.round()}g",
                   radius: sectionRadius,
                   titleStyle: textStyle,
                 ),
                 PieChartSectionData(
-                  value: widget.fatGrams,
+                  value: max(widget.fatGrams, NutritionChart.minValue),
                   color: Colors.amber,
                   title: "${widget.fatGrams.round()}g",
                   radius: sectionRadius,

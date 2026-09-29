@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/models/user.dart';
 
 class ApiException implements Exception {
@@ -35,7 +36,12 @@ class Api extends ChangeNotifier {
   DateTime? _expiresAt;
   Future<void>? _refreshing;
 
+  List<FoodItem> foodItems = [];
+  int _nextPendingId = -1;
+
   bool get isLoggedIn => user != null;
+
+  String get _today => DateTime.now().toIso8601String().substring(0, 10);
 
   Future<void> restoreSession() async {
     final session = await _storage.readAll();
@@ -54,8 +60,106 @@ class Api extends ChangeNotifier {
     _refreshToken = refreshToken;
     _expiresAt = DateTime.parse(expiresAt);
     setHeader('Authorization', 'Bearer $accessToken');
+    _restoreFoodItems(session['food_items']);
 
     _syncUser();
+    syncFoodItems();
+  }
+
+  void _restoreFoodItems(String? json) {
+    if (json == null) return;
+
+    final today = _today;
+    foodItems = (jsonDecode(json) as List)
+        .map((item) => FoodItem.fromJson(item))
+        .where((item) => item.date == today)
+        .toList();
+  }
+
+  Future<void> syncFoodItems() async {
+    try {
+      final data = await get('/food-items', {'date': _today});
+      final items = (data as List).map((json) => FoodItem.fromJson(json));
+
+      foodItems = [...items, ...foodItems.where((item) => item.isPending)];
+      _saveFoodItems();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> addFoodItem(FoodItemDraft draft) async {
+    final pending = FoodItem(
+      id: _nextPendingId--,
+      food: draft.food,
+      date: _today,
+      meal: draft.meal,
+      amount: draft.amount,
+      unit: draft.unit,
+    );
+    foodItems = [...foodItems, pending];
+    notifyListeners();
+
+    try {
+      final data = await post('/food-items', _foodItemBody(pending));
+      final item = FoodItem.fromJson(data);
+
+      foodItems = [
+        for (final i in foodItems)
+          if (i.id == pending.id) item else if (i.id != item.id) i,
+      ];
+      _saveFoodItems();
+    } catch (_) {
+      foodItems = foodItems.where((i) => i.id != pending.id).toList();
+      rethrow;
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateFoodItem(FoodItem item, FoodItemDraft draft) async {
+    final predicted = FoodItem(
+      id: item.id,
+      food: item.food,
+      date: item.date,
+      meal: draft.meal,
+      amount: draft.amount,
+      unit: draft.unit,
+    );
+    _replaceFoodItem(predicted);
+    notifyListeners();
+
+    try {
+      final data = await put(
+        '/food-items/${item.id}',
+        _foodItemBody(predicted),
+      );
+      _replaceFoodItem(FoodItem.fromJson(data));
+      _saveFoodItems();
+    } catch (_) {
+      _replaceFoodItem(item);
+      rethrow;
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  void _replaceFoodItem(FoodItem item) {
+    foodItems = [for (final i in foodItems) i.id == item.id ? item : i];
+  }
+
+  Map<String, dynamic> _foodItemBody(FoodItem item) {
+    return {
+      'food_id': item.food.id,
+      'date': item.date,
+      'meal': item.meal,
+      'amount': item.amount,
+      'unit': item.unit,
+    };
+  }
+
+  void _saveFoodItems() {
+    final items = foodItems.where((item) => !item.isPending).toList();
+    _storage.write(key: 'food_items', value: jsonEncode(items));
   }
 
   Future<void> _syncUser() async {
@@ -70,6 +174,7 @@ class Api extends ChangeNotifier {
       'password': password,
     });
     _setSession(data);
+    syncFoodItems();
   }
 
   Future<void> register(
@@ -83,6 +188,7 @@ class Api extends ChangeNotifier {
       'password_confirmation': passwordConfirmation,
     });
     _setSession(data);
+    syncFoodItems();
   }
 
   Future<void> updateGoals({
@@ -117,6 +223,7 @@ class Api extends ChangeNotifier {
     user = null;
     _refreshToken = null;
     _expiresAt = null;
+    foodItems = [];
     removeHeader('Authorization');
     _storage.deleteAll();
     notifyListeners();
