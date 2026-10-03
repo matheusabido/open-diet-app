@@ -9,6 +9,7 @@ class TextInput extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.onChanged,
+    this.enabled = true,
   });
 
   final TextEditingController? controller;
@@ -16,6 +17,7 @@ class TextInput extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class TextInput extends StatelessWidget {
 
         enabledBorder: border,
         focusedBorder: border,
+        disabledBorder: border,
 
         contentPadding: .all(8),
 
@@ -39,7 +42,10 @@ class TextInput extends StatelessWidget {
         labelStyle: TextStyle(color: Colors.grey.shade500),
         floatingLabelStyle: TextStyle(color: AppColors.textSecondary),
       ),
-      style: TextStyle(color: Colors.grey.shade200),
+      style: TextStyle(
+        color: enabled ? Colors.grey.shade200 : Colors.grey.shade500,
+      ),
+      enabled: enabled,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,

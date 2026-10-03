@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/menu_item.dart';
 import 'package:open_diet/components/profile/logout_button.dart';
+import 'package:open_diet/pages/goals_calculator_page.dart';
 import 'package:open_diet/pages/goals_page.dart';
 import 'package:open_diet/pages/password_page.dart';
 import 'package:open_diet/services/api.dart';
@@ -42,6 +43,11 @@ class ProfilePage extends StatelessWidget {
               icon: Icons.flag_outlined,
               label: 'Metas diárias',
               onTap: () => open(context, const GoalsPage()),
+            ),
+            MenuItem(
+              icon: Icons.calculate_outlined,
+              label: 'Calcular metas',
+              onTap: () => open(context, const GoalsCalculatorPage()),
             ),
             MenuItem(
               icon: Icons.lock_outline,

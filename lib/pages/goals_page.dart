@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:open_diet/components/input/number_input.dart';
+import 'package:open_diet/components/input/switch_input.dart';
 import 'package:open_diet/components/primary_button.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
 import 'package:open_diet/utils/errors.dart';
+import 'package:open_diet/utils/tdee.dart';
 import 'package:open_diet/utils/toast.dart';
 
 class GoalsPage extends StatefulWidget {
@@ -25,8 +27,40 @@ class _GoalsPageState extends State<GoalsPage> {
   );
   late final fatController = TextEditingController(text: '${user.fatGoal}');
 
+  late bool isCustom = !_matchesAuto;
   bool isLoading = false;
   String? errorMessage;
+
+  bool get _matchesAuto {
+    final macros = calculateMacros(user.kcalGoal);
+    return user.proteinGoal == macros.protein &&
+        user.carbohydrateGoal == macros.carbohydrate &&
+        user.fatGoal == macros.fat;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    kcalController.addListener(onKcalChanged);
+  }
+
+  void onKcalChanged() {
+    if (isCustom) return;
+
+    final macros = calculateMacros(
+      int.tryParse(kcalController.text.trim()) ?? 0,
+    );
+    proteinController.text = '${macros.protein}';
+    carbohydrateController.text = '${macros.carbohydrate}';
+    fatController.text = '${macros.fat}';
+  }
+
+  void onCustomChanged(bool value) {
+    setState(() {
+      isCustom = value;
+    });
+    onKcalChanged();
+  }
 
   static const _fieldLabels = {
     'kcal_goal': 'Calorias',
@@ -113,12 +147,18 @@ class _GoalsPageState extends State<GoalsPage> {
                     decimal: false,
                   ),
                 ),
+                SwitchInput(
+                  label: 'Personalizar macronutrientes',
+                  value: isCustom,
+                  onChanged: onCustomChanged,
+                ),
                 SizedBox(
                   height: 48,
                   child: NumberInput(
                     label: 'Proteína (g) *',
                     controller: proteinController,
                     decimal: false,
+                    enabled: isCustom,
                   ),
                 ),
                 SizedBox(
@@ -127,6 +167,7 @@ class _GoalsPageState extends State<GoalsPage> {
                     label: 'Carboidrato (g) *',
                     controller: carbohydrateController,
                     decimal: false,
+                    enabled: isCustom,
                   ),
                 ),
                 SizedBox(
@@ -135,6 +176,7 @@ class _GoalsPageState extends State<GoalsPage> {
                     label: 'Gordura (g) *',
                     controller: fatController,
                     decimal: false,
+                    enabled: isCustom,
                   ),
                 ),
                 if (errorMessage != null)

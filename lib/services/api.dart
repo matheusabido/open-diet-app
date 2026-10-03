@@ -9,6 +9,7 @@ import 'package:open_diet/models/food_draft.dart';
 import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/models/user.dart';
 import 'package:open_diet/models/voice_food_item.dart';
+import 'package:open_diet/utils/tdee.dart';
 
 class ApiException implements Exception {
   final int statusCode;
@@ -238,6 +239,22 @@ class Api extends ChangeNotifier {
       'protein_goal': protein,
       'carbohydrate_goal': carbohydrate,
       'fat_goal': fat,
+    });
+    _setUser(data);
+  }
+
+  Future<void> updateBodyProfile(BodyProfile profile, MacroGoals goals) async {
+    final data = await patch('/users/me', {
+      'sex': profile.sex,
+      'age': profile.age,
+      'weight': profile.weight,
+      'height': profile.height,
+      'activity_level': profile.activityLevel,
+      'objective': profile.objective,
+      'kcal_goal': goals.kcal,
+      'protein_goal': goals.protein,
+      'carbohydrate_goal': goals.carbohydrate,
+      'fat_goal': goals.fat,
     });
     _setUser(data);
   }
