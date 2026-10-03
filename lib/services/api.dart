@@ -22,7 +22,7 @@ class ApiException implements Exception {
 }
 
 class Api extends ChangeNotifier {
-  static const _baseUrl = 'http://192.168.68.2:3000';
+  static const _baseUrl = String.fromEnvironment('API_URL');
   static const _refreshThreshold = Duration(minutes: 2);
   static const _storage = FlutterSecureStorage();
 
