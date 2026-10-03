@@ -20,7 +20,14 @@ class OpenDietApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Open Diet',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.green)),
+      theme: ThemeData(
+        // The Android page transition fades through the surface color, so it
+        // has to match the pages or the screen flashes white.
+        colorScheme: .fromSeed(
+          seedColor: Colors.green,
+          surface: AppColors.background,
+        ),
+      ),
       home: const MyHomePage(),
     );
   }

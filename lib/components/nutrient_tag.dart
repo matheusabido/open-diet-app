@@ -25,7 +25,7 @@ class NutrientTag extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: .circle),
         ),
         Text(
-          '$label ${formatAmount(grams)}g',
+          '$label ${formatRounded(grams)}g',
           style: TextStyle(color: Colors.white70, fontSize: 12),
         ),
       ],

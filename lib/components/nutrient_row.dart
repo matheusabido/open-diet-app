@@ -39,7 +39,7 @@ class NutrientRow extends StatelessWidget {
             child: Text(label, style: TextStyle(color: Colors.white70)),
           ),
           Text(
-            '${formatAmount(value)} $unit',
+            '${formatRounded(value)} $unit',
             style: TextStyle(color: Colors.white, fontWeight: .w600),
           ),
         ],

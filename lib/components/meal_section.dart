@@ -27,10 +27,19 @@ class MealSectionState extends State<MealSection> {
   Future<void> editItem(FoodItem item) async {
     final draft = await Navigator.of(context).push<FoodItemDraft>(
       MaterialPageRoute(
-        builder: (_) => FoodItemFormPage(food: item.food, item: item),
+        builder: (_) => FoodItemFormPage(
+          food: item.food,
+          item: item,
+          onDelete: () => deleteItem(item),
+        ),
       ),
     );
     if (draft != null && mounted) updateFoodItem(context, item, draft);
+  }
+
+  void deleteItem(FoodItem item) {
+    Navigator.of(context).pop();
+    removeFoodItem(context, item);
   }
 
   @override

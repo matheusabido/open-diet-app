@@ -20,7 +20,13 @@ class FoodItemTileState extends State<FoodItemTile> {
 
     const amountTextStyle = TextStyle(color: Colors.white54);
 
+    const brandTextStyle = TextStyle(
+      color: AppColors.textSecondary,
+      fontSize: 12,
+    );
+
     final item = widget.item;
+    final brand = item.food.brand;
 
     return Opacity(
       opacity: item.isPending ? 0.5 : 1,
@@ -39,19 +45,41 @@ class FoodItemTileState extends State<FoodItemTile> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Row(
+                    child: Column(
                       crossAxisAlignment: .start,
-                      spacing: 8,
+                      spacing: 2,
                       children: [
-                        Text(item.food.name, style: nameTextStyle),
-                        Text("·", style: amountTextStyle),
-                        Text(
-                          "${formatAmount(item.amount)} ${item.unit}",
-                          style: amountTextStyle,
+                        Row(
+                          crossAxisAlignment: .baseline,
+                          textBaseline: .alphabetic,
+                          spacing: 8,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                item.food.name,
+                                maxLines: 2,
+                                overflow: .ellipsis,
+                                style: nameTextStyle,
+                              ),
+                            ),
+                            Text("·", style: amountTextStyle),
+                            Text(
+                              "${formatAmount(item.amount)} ${item.unit}",
+                              style: amountTextStyle,
+                            ),
+                          ],
                         ),
+                        if (brand != null)
+                          Text(
+                            brand,
+                            maxLines: 1,
+                            overflow: .ellipsis,
+                            style: brandTextStyle,
+                          ),
                       ],
                     ),
                   ),
+                  SizedBox(width: 8),
                   Text("${item.kcal.round()} kcal", style: nameTextStyle),
                   Icon(Icons.keyboard_arrow_right, color: Colors.white70),
                 ],

@@ -23,8 +23,6 @@ Future<FoodDraft?> foodFromPhoto(BuildContext context, String imagePath) {
   );
 }
 
-/// Opens the camera to take the photo of a nutrition label, or the gallery
-/// when the device has no camera. The photo is reduced before the upload.
 Future<String?> pickLabelPhoto() async {
   final picker = ImagePicker();
 

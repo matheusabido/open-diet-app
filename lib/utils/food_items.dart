@@ -34,6 +34,14 @@ Future<void> updateFoodItem(
   );
 }
 
+Future<void> removeFoodItem(BuildContext context, FoodItem item) {
+  return runRequest(
+    context,
+    () => Api.instance.removeFoodItem(item),
+    fieldLabels: _fieldLabels,
+  );
+}
+
 Future<VoiceFoodItem?> voiceFoodItem(BuildContext context, String audioPath) {
   return runRequest(
     context,

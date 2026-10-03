@@ -40,12 +40,14 @@ class FoodCard extends StatelessWidget {
                     spacing: 2,
                     children: [
                       Row(
+                        crossAxisAlignment: .baseline,
+                        textBaseline: .alphabetic,
                         spacing: 6,
                         children: [
                           Flexible(
                             child: Text(
                               food.name,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: .ellipsis,
                               style: TextStyle(
                                 color: Colors.white,
@@ -53,20 +55,18 @@ class FoodCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if (brand != null)
-                            Flexible(
-                              child: Text(
-                                brand,
-                                maxLines: 1,
-                                overflow: .ellipsis,
-                                style: secondaryTextStyle,
-                              ),
-                            ),
                           Text('·', style: secondaryTextStyle),
                           Text(portion, style: secondaryTextStyle),
                         ],
                       ),
-                      Row(
+                      if (brand != null)
+                        Text(
+                          brand,
+                          maxLines: 1,
+                          overflow: .ellipsis,
+                          style: secondaryTextStyle,
+                        ),
+                      Wrap(
                         spacing: 12,
                         children: [
                           NutrientTag(

@@ -10,6 +10,7 @@ import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/models/voice_food_item.dart';
 import 'package:open_diet/pages/food_item_form_page.dart';
 import 'package:open_diet/pages/foods_page.dart';
+import 'package:open_diet/pages/voice_link_page.dart';
 import 'package:open_diet/theme/colors.dart';
 import 'package:open_diet/utils/food_items.dart';
 import 'package:open_diet/utils/toast.dart';
@@ -36,8 +37,7 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
 
   bool isRecording = false;
   bool isLoading = false;
-  bool isLinking = false;
-  VoiceFoodItem? unlinked;
+  VoiceFoodItem? linking;
 
   Timer? _timeout;
 
@@ -78,16 +78,31 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
     final voice = await voiceFoodItem(context, path);
     if (!mounted) return;
 
-    final food = voice?.food;
-    setState(() {
-      isLoading = false;
-      if (food == null) unlinked = voice;
-    });
-    if (voice != null && food != null) confirm(food, voice);
+    setState(() => isLoading = false);
+    if (voice == null) return;
+
+    final food = voice.food;
+    food == null ? askToLink(voice) : confirm(food, voice);
+  }
+
+  Future<void> askToLink(VoiceFoodItem voice) async {
+    final action = await Navigator.of(context).push<VoiceLinkAction>(
+      MaterialPageRoute(builder: (_) => VoiceLinkPage(voice: voice)),
+    );
+    if (!mounted) return;
+
+    switch (action) {
+      case VoiceLinkAction.link:
+        setState(() => linking = voice);
+      case VoiceLinkAction.recordAgain:
+        startRecording();
+      case null:
+        break;
+    }
   }
 
   Future<void> linkFood(Food food) async {
-    final voice = unlinked!;
+    final voice = linking!;
 
     final linked = await linkFoodAlias(context, voice.aliasId, food);
     if (!linked || !mounted) return;
@@ -98,17 +113,11 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
 
   void relink(VoiceFoodItem voice) {
     Navigator.of(context).pop();
-    setState(() {
-      isLinking = true;
-      unlinked = voice;
-    });
+    setState(() => linking = voice);
   }
 
   void cancelLink() {
-    setState(() {
-      isLinking = false;
-      unlinked = null;
-    });
+    setState(() => linking = null);
   }
 
   Future<void> confirm(Food food, VoiceFoodItem voice) async {
@@ -132,6 +141,8 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
 
   @override
   Widget build(BuildContext context) {
+    final linking = this.linking;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -152,19 +163,19 @@ class _SelectFoodPageState extends State<SelectFoodPage> {
                 padding: .fromLTRB(16, 16, 16, 0),
                 child: RecordingIndicator(),
               ),
-            if (unlinked != null)
+            if (linking != null)
               Padding(
                 padding: .fromLTRB(16, 16, 16, 0),
                 child: VoiceLinkBanner(
-                  isLinking: isLinking,
-                  onLink: () => setState(() => isLinking = true),
+                  name: linking.name,
                   onCancel: cancelLink,
                 ),
               ),
             Expanded(
               child: FoodsPage(
                 meal: widget.meal,
-                onSelect: isLinking ? linkFood : null,
+                onSelect: linking == null ? null : linkFood,
+                showScanButtons: linking == null,
               ),
             ),
           ],

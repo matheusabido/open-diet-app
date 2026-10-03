@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_diet/components/confirm_dialog.dart';
 import 'package:open_diet/components/input/meal_select.dart';
 import 'package:open_diet/components/input/number_input.dart';
 import 'package:open_diet/components/input/unit_select.dart';
@@ -20,6 +21,7 @@ class FoodItemFormPage extends StatefulWidget {
     this.amount,
     this.unit,
     this.onRelink,
+    this.onDelete,
   });
 
   final Food food;
@@ -28,6 +30,7 @@ class FoodItemFormPage extends StatefulWidget {
   final double? amount;
   final String? unit;
   final VoidCallback? onRelink;
+  final VoidCallback? onDelete;
 
   @override
   State<FoodItemFormPage> createState() => _FoodItemFormPageState();
@@ -79,6 +82,18 @@ class _FoodItemFormPageState extends State<FoodItemFormPage> {
     Navigator.of(context).pop(draft);
   }
 
+  Future<void> delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => ConfirmDialog(
+        title: 'Remover da refeição',
+        message: 'Tem certeza que deseja remover "${widget.food.name}"?',
+        confirmLabel: 'Remover',
+      ),
+    );
+    if (confirmed == true) widget.onDelete!();
+  }
+
   @override
   Widget build(BuildContext context) {
     final food = widget.food;
@@ -94,6 +109,13 @@ class _FoodItemFormPageState extends State<FoodItemFormPage> {
         title: Text(isEditing ? 'Editar refeição' : 'Adicionar à refeição'),
         backgroundColor: AppColors.background,
         foregroundColor: Colors.grey.shade200,
+        actions: [
+          if (widget.onDelete != null)
+            IconButton(
+              onPressed: delete,
+              icon: Icon(Icons.delete_outline, color: Colors.red.shade300),
+            ),
+        ],
       ),
       body: SafeArea(
         child: ListView(

@@ -22,7 +22,7 @@ class ApiException implements Exception {
 }
 
 class Api extends ChangeNotifier {
-  static const _baseUrl = 'http://localhost:3000';
+  static const _baseUrl = 'http://192.168.68.2:3000';
   static const _refreshThreshold = Duration(minutes: 2);
   static const _storage = FlutterSecureStorage();
 
@@ -160,6 +160,21 @@ class Api extends ChangeNotifier {
       rethrow;
     } finally {
       notifyListeners();
+    }
+  }
+
+  Future<void> removeFoodItem(FoodItem item) async {
+    final previous = foodItems;
+    foodItems = foodItems.where((i) => i.id != item.id).toList();
+    notifyListeners();
+
+    try {
+      await delete('/food-items/${item.id}');
+      _saveFoodItems();
+    } catch (_) {
+      foodItems = previous;
+      notifyListeners();
+      rethrow;
     }
   }
 

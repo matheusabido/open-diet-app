@@ -16,10 +16,16 @@ import 'package:open_diet/services/api.dart';
 import 'package:open_diet/utils/foods.dart';
 
 class FoodsPage extends StatefulWidget {
-  const FoodsPage({super.key, this.meal, this.onSelect});
+  const FoodsPage({
+    super.key,
+    this.meal,
+    this.onSelect,
+    this.showScanButtons = true,
+  });
 
   final String? meal;
   final ValueChanged<Food>? onSelect;
+  final bool showScanButtons;
 
   @override
   State<FoodsPage> createState() => _FoodsPageState();
@@ -30,6 +36,7 @@ class _FoodsPageState extends State<FoodsPage> {
   final scrollController = ScrollController();
 
   static const _pageSize = 20;
+  static const _minHeightForScanButtons = 320;
 
   List<Food> foods = [];
   bool isLoading = false;
@@ -179,87 +186,96 @@ class _FoodsPageState extends State<FoodsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: .all(16),
-      child: Column(
-        spacing: 16,
-        children: [
-          Row(
-            spacing: 8,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final showScanButtons =
+            widget.showScanButtons &&
+            constraints.maxHeight >= _minHeightForScanButtons;
+
+        return Padding(
+          padding: .all(16),
+          child: Column(
+            spacing: 16,
             children: [
-              Expanded(
-                child: ScanButton(
-                  icon: Icons.qr_code_scanner,
-                  label: 'Código de barras',
-                  onPressed: scanBarcode,
-                  isLoading: isReadingBarcode,
+              if (showScanButtons)
+                Row(
+                  spacing: 8,
+                  children: [
+                    Expanded(
+                      child: ScanButton(
+                        icon: Icons.qr_code_scanner,
+                        label: 'Código de barras',
+                        onPressed: scanBarcode,
+                        isLoading: isReadingBarcode,
+                      ),
+                    ),
+                    Expanded(
+                      child: ScanButton(
+                        icon: Icons.photo_camera,
+                        label: 'Foto da tabela',
+                        onPressed: takePhoto,
+                        isLoading: isReadingPhoto,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              Expanded(
-                child: ScanButton(
-                  icon: Icons.photo_camera,
-                  label: 'Foto da tabela',
-                  onPressed: takePhoto,
-                  isLoading: isReadingPhoto,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            spacing: 8,
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 48,
-                  child: TextInput(
-                    label: 'Pesquisar por nome',
-                    controller: controller,
-                    onChanged: onSearch,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: IconButton(
-                  onPressed: () => openForm(),
-                  icon: Icon(Icons.add, color: Colors.grey.shade300),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.blue.shade800,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              Row(
+                spacing: 8,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: TextInput(
+                        label: 'Pesquisar por nome',
+                        controller: controller,
+                        onChanged: onSearch,
+                      ),
                     ),
                   ),
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: IconButton(
+                      onPressed: () => openForm(),
+                      icon: Icon(Icons.add, color: Colors.grey.shade300),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.blue.shade800,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () => loadFoods(reset: true),
+                  child: ListView.separated(
+                    controller: scrollController,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    itemCount: foods.length + 1,
+                    separatorBuilder: (_, _) => SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      if (index == foods.length) {
+                        return FoodListFooter(
+                          isLoading: isLoading,
+                          isEmpty: foods.isEmpty,
+                          errorMessage: errorMessage,
+                          onRetry: loadFoods,
+                        );
+                      }
+
+                      final food = foods[index];
+                      return FoodCard(food: food, onTap: () => onFoodTap(food));
+                    },
+                  ),
                 ),
               ),
             ],
           ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => loadFoods(reset: true),
-              child: ListView.separated(
-                controller: scrollController,
-                physics: AlwaysScrollableScrollPhysics(),
-                itemCount: foods.length + 1,
-                separatorBuilder: (_, _) => SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  if (index == foods.length) {
-                    return FoodListFooter(
-                      isLoading: isLoading,
-                      isEmpty: foods.isEmpty,
-                      errorMessage: errorMessage,
-                      onRetry: loadFoods,
-                    );
-                  }
-
-                  final food = foods[index];
-                  return FoodCard(food: food, onTap: () => onFoodTap(food));
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
