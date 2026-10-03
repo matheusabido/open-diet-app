@@ -4,6 +4,7 @@ class Food {
   final int id;
   final String name;
   final String? brand;
+  final String? barcode;
 
   final double kcal;
   final double protein;
@@ -17,6 +18,7 @@ class Food {
     required this.id,
     required this.name,
     this.brand,
+    this.barcode,
     required this.kcal,
     required this.protein,
     required this.carbohydrate,
@@ -30,6 +32,7 @@ class Food {
       id: json['id'],
       name: json['name'],
       brand: json['brand'],
+      barcode: json['barcode'],
       kcal: (json['kcal'] as num).toDouble(),
       protein: (json['protein'] as num).toDouble(),
       carbohydrate: (json['carbohydrate'] as num).toDouble(),
@@ -48,6 +51,7 @@ class Food {
       'id': id,
       'name': name,
       'brand': brand,
+      'barcode': barcode,
       'kcal': kcal,
       'protein': protein,
       'carbohydrate': carbohydrate,

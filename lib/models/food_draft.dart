@@ -1,6 +1,7 @@
 class FoodDraft {
   final String? name;
   final String? brand;
+  final String? barcode;
 
   final double? kcal;
   final double? protein;
@@ -13,6 +14,7 @@ class FoodDraft {
   FoodDraft({
     this.name,
     this.brand,
+    this.barcode,
     this.kcal,
     this.protein,
     this.carbohydrate,
@@ -25,6 +27,7 @@ class FoodDraft {
     return FoodDraft(
       name: json['name'],
       brand: json['brand'],
+      barcode: json['barcode'],
       kcal: (json['kcal'] as num?)?.toDouble(),
       protein: (json['protein'] as num?)?.toDouble(),
       carbohydrate: (json['carbohydrate'] as num?)?.toDouble(),

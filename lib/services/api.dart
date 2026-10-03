@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_diet/models/food.dart';
+import 'package:open_diet/models/food_barcode.dart';
 import 'package:open_diet/models/food_draft.dart';
 import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/models/user.dart';
@@ -119,8 +120,8 @@ class Api extends ChangeNotifier {
     }
   }
 
-  Future<FoodDraft> foodFromBarcode(String barcode) async {
-    return FoodDraft.fromJson(await get('/foods/barcode/$barcode'));
+  Future<FoodBarcode> foodFromBarcode(String barcode) async {
+    return FoodBarcode.fromJson(await get('/foods/barcode/$barcode'));
   }
 
   Future<FoodDraft> foodFromPhoto(String imagePath) async {

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_diet/models/food_barcode.dart';
 import 'package:open_diet/models/food_draft.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/utils/requests.dart';
 
 const _fieldLabels = {'barcode': 'Código de barras', 'image': 'Foto'};
 
-Future<FoodDraft?> foodFromBarcode(BuildContext context, String barcode) {
+Future<FoodBarcode?> foodFromBarcode(BuildContext context, String barcode) {
   return runRequest(
     context,
     () => Api.instance.foodFromBarcode(barcode),

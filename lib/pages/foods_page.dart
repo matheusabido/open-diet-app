@@ -125,11 +125,14 @@ class _FoodsPageState extends State<FoodsPage> {
     if (barcode == null || !mounted) return;
 
     setState(() => isReadingBarcode = true);
-    final draft = await foodFromBarcode(context, barcode);
+    final result = await foodFromBarcode(context, barcode);
     if (!mounted) return;
 
     setState(() => isReadingBarcode = false);
-    if (draft != null) openForm(draft);
+    if (result == null) return;
+
+    final food = result.food;
+    food == null ? openForm(result.draft) : onFoodTap(food);
   }
 
   Future<void> takePhoto() async {

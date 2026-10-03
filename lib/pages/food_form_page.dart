@@ -50,6 +50,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
   static const _fieldLabels = {
     'name': 'Nome',
     'brand': 'Marca',
+    'barcode': 'Código de barras',
     'amount': 'Porção',
     'unit': 'Unidade',
     'kcal': 'Calorias',
@@ -101,6 +102,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
       final body = {
         'name': nameController.text.trim(),
         'brand': brand.isEmpty ? null : brand,
+        'barcode': widget.draft?.barcode,
         'amount': parseNumber(amountController),
         'unit': unit,
         'kcal': parseNumber(kcalController),
