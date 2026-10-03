@@ -4,17 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:open_diet/components/food_card.dart';
 import 'package:open_diet/components/food_list_footer.dart';
 import 'package:open_diet/components/input/text_input.dart';
+import 'package:open_diet/components/scan_button.dart';
 import 'package:open_diet/models/food.dart';
+import 'package:open_diet/models/food_draft.dart';
 import 'package:open_diet/models/food_item.dart';
+import 'package:open_diet/pages/barcode_scanner_page.dart';
 import 'package:open_diet/pages/food_detail_page.dart';
 import 'package:open_diet/pages/food_form_page.dart';
 import 'package:open_diet/pages/food_item_form_page.dart';
 import 'package:open_diet/services/api.dart';
+import 'package:open_diet/utils/foods.dart';
 
 class FoodsPage extends StatefulWidget {
-  const FoodsPage({super.key, this.meal});
+  const FoodsPage({super.key, this.meal, this.onSelect});
 
   final String? meal;
+  final ValueChanged<Food>? onSelect;
 
   @override
   State<FoodsPage> createState() => _FoodsPageState();
@@ -29,6 +34,8 @@ class _FoodsPageState extends State<FoodsPage> {
   List<Food> foods = [];
   bool isLoading = false;
   bool hasMore = true;
+  bool isReadingBarcode = false;
+  bool isReadingPhoto = false;
   String? errorMessage;
 
   Timer? _debounce;
@@ -97,10 +104,37 @@ class _FoodsPageState extends State<FoodsPage> {
     });
   }
 
-  Future<void> openForm() async {
-    final food = await Navigator.of(context)
-        .push<Food>(MaterialPageRoute(builder: (_) => const FoodFormPage()));
+  Future<void> openForm([FoodDraft? draft]) async {
+    final food = await Navigator.of(
+      context,
+    ).push<Food>(MaterialPageRoute(builder: (_) => FoodFormPage(draft: draft)));
     if (food != null) loadFoods(reset: true);
+  }
+
+  Future<void> scanBarcode() async {
+    final barcode = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
+    );
+    if (barcode == null || !mounted) return;
+
+    setState(() => isReadingBarcode = true);
+    final draft = await foodFromBarcode(context, barcode);
+    if (!mounted) return;
+
+    setState(() => isReadingBarcode = false);
+    if (draft != null) openForm(draft);
+  }
+
+  Future<void> takePhoto() async {
+    final path = await pickLabelPhoto();
+    if (path == null || !mounted) return;
+
+    setState(() => isReadingPhoto = true);
+    final draft = await foodFromPhoto(context, path);
+    if (!mounted) return;
+
+    setState(() => isReadingPhoto = false);
+    if (draft != null) openForm(draft);
   }
 
   void openDetail(Food food) {
@@ -125,6 +159,9 @@ class _FoodsPageState extends State<FoodsPage> {
   }
 
   void onFoodTap(Food food) {
+    final onSelect = widget.onSelect;
+    if (onSelect != null) return onSelect(food);
+
     widget.meal == null ? openDetail(food) : selectFood(food);
   }
 
@@ -151,6 +188,27 @@ class _FoodsPageState extends State<FoodsPage> {
             spacing: 8,
             children: [
               Expanded(
+                child: ScanButton(
+                  icon: Icons.qr_code_scanner,
+                  label: 'Código de barras',
+                  onPressed: scanBarcode,
+                  isLoading: isReadingBarcode,
+                ),
+              ),
+              Expanded(
+                child: ScanButton(
+                  icon: Icons.photo_camera,
+                  label: 'Foto da tabela',
+                  onPressed: takePhoto,
+                  isLoading: isReadingPhoto,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            spacing: 8,
+            children: [
+              Expanded(
                 child: SizedBox(
                   height: 48,
                   child: TextInput(
@@ -164,7 +222,7 @@ class _FoodsPageState extends State<FoodsPage> {
                 width: 48,
                 height: 48,
                 child: IconButton(
-                  onPressed: openForm,
+                  onPressed: () => openForm(),
                   icon: Icon(Icons.add, color: Colors.grey.shade300),
                   style: IconButton.styleFrom(
                     backgroundColor: Colors.blue.shade800,

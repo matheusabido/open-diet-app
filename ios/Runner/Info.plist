@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>O microfone é usado para registrar alimentos por voz.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>A câmera é usada para ler códigos de barras e fotografar tabelas nutricionais.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>As fotos são usadas para ler tabelas nutricionais.</string>
 </dict>
 </plist>

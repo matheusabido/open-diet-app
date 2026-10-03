@@ -4,32 +4,46 @@ import 'package:open_diet/components/input/text_input.dart';
 import 'package:open_diet/components/primary_button.dart';
 import 'package:open_diet/components/input/unit_select.dart';
 import 'package:open_diet/models/food.dart';
+import 'package:open_diet/models/food_draft.dart';
 import 'package:open_diet/services/api.dart';
 import 'package:open_diet/theme/colors.dart';
 import 'package:open_diet/utils/errors.dart';
 import 'package:open_diet/utils/numbers.dart';
 
 class FoodFormPage extends StatefulWidget {
-  const FoodFormPage({super.key, this.food});
+  const FoodFormPage({super.key, this.food, this.draft});
 
   final Food? food;
+  final FoodDraft? draft;
 
   @override
   State<FoodFormPage> createState() => _FoodFormPageState();
 }
 
 class _FoodFormPageState extends State<FoodFormPage> {
-  late final nameController = TextEditingController(text: widget.food?.name);
-  late final brandController = TextEditingController(text: widget.food?.brand);
-  late final amountController = numberController(widget.food?.amount ?? 100);
-  late final kcalController = numberController(widget.food?.kcal);
-  late final proteinController = numberController(widget.food?.protein);
-  late final carbohydrateController = numberController(
-    widget.food?.carbohydrate,
+  late final nameController = TextEditingController(
+    text: widget.food?.name ?? widget.draft?.name,
   );
-  late final fatController = numberController(widget.food?.fat);
+  late final brandController = TextEditingController(
+    text: widget.food?.brand ?? widget.draft?.brand,
+  );
+  late final amountController = numberController(
+    widget.food?.amount ?? widget.draft?.amount ?? 100,
+  );
+  late final kcalController = numberController(
+    widget.food?.kcal ?? widget.draft?.kcal,
+  );
+  late final proteinController = numberController(
+    widget.food?.protein ?? widget.draft?.protein,
+  );
+  late final carbohydrateController = numberController(
+    widget.food?.carbohydrate ?? widget.draft?.carbohydrate,
+  );
+  late final fatController = numberController(
+    widget.food?.fat ?? widget.draft?.fat,
+  );
 
-  late String unit = widget.food?.unit ?? 'g';
+  late String unit = widget.food?.unit ?? widget.draft?.unit ?? 'g';
   bool isLoading = false;
   String? errorMessage;
 

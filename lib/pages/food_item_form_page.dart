@@ -4,6 +4,7 @@ import 'package:open_diet/components/input/number_input.dart';
 import 'package:open_diet/components/input/unit_select.dart';
 import 'package:open_diet/components/nutrient_row.dart';
 import 'package:open_diet/components/primary_button.dart';
+import 'package:open_diet/components/secondary_button.dart';
 import 'package:open_diet/models/food.dart';
 import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/theme/colors.dart';
@@ -11,11 +12,22 @@ import 'package:open_diet/utils/numbers.dart';
 import 'package:open_diet/utils/units.dart';
 
 class FoodItemFormPage extends StatefulWidget {
-  const FoodItemFormPage({super.key, required this.food, this.meal, this.item});
+  const FoodItemFormPage({
+    super.key,
+    required this.food,
+    this.meal,
+    this.item,
+    this.amount,
+    this.unit,
+    this.onRelink,
+  });
 
   final Food food;
   final String? meal;
   final FoodItem? item;
+  final double? amount;
+  final String? unit;
+  final VoidCallback? onRelink;
 
   @override
   State<FoodItemFormPage> createState() => _FoodItemFormPageState();
@@ -23,12 +35,16 @@ class FoodItemFormPage extends StatefulWidget {
 
 class _FoodItemFormPageState extends State<FoodItemFormPage> {
   late final amountController = TextEditingController(
-    text: formatAmount(widget.item?.amount ?? widget.food.amount),
+    text: formatAmount(
+      widget.item?.amount ?? widget.amount ?? widget.food.amount,
+    ),
   );
   late final units = compatibleUnits(widget.food.unit);
 
   late String meal = widget.item?.meal ?? widget.meal ?? mealNames.keys.first;
-  late String unit = widget.item?.unit ?? widget.food.unit;
+  late String unit =
+      widget.item?.unit ??
+      (units.contains(widget.unit) ? widget.unit! : widget.food.unit);
   String? errorMessage;
 
   @override
@@ -166,6 +182,12 @@ class _FoodItemFormPageState extends State<FoodItemFormPage> {
                   label: isEditing ? 'Salvar' : 'Adicionar',
                   onPressed: submit,
                 ),
+                if (widget.onRelink != null)
+                  SecondaryButton(
+                    label: 'Vincular outro alimento',
+                    icon: Icons.link,
+                    onPressed: widget.onRelink!,
+                  ),
               ],
             ),
           ],

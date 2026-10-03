@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_diet/models/food.dart';
+import 'package:open_diet/models/food_draft.dart';
 import 'package:open_diet/models/food_item.dart';
 import 'package:open_diet/models/user.dart';
+import 'package:open_diet/models/voice_food_item.dart';
 
 class ApiException implements Exception {
   final int statusCode;
@@ -114,6 +117,23 @@ class Api extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  Future<FoodDraft> foodFromBarcode(String barcode) async {
+    return FoodDraft.fromJson(await get('/foods/barcode/$barcode'));
+  }
+
+  Future<FoodDraft> foodFromPhoto(String imagePath) async {
+    return FoodDraft.fromJson(await upload('/foods/photo', 'image', imagePath));
+  }
+
+  Future<VoiceFoodItem> voiceFoodItem(String audioPath) async {
+    final data = await upload('/food-items/voice', 'audio', audioPath);
+    return VoiceFoodItem.fromJson(data);
+  }
+
+  Future<void> linkFoodAlias(int aliasId, Food food) async {
+    await put('/food-aliases/$aliasId', {'food_id': food.id});
   }
 
   Future<void> updateFoodItem(FoodItem item, FoodItemDraft draft) async {
@@ -245,6 +265,15 @@ class Api extends ChangeNotifier {
       headers: _headers,
       body: jsonEncode(body),
     );
+    return _handleResponse(res);
+  }
+
+  Future<dynamic> upload(String path, String field, String filePath) async {
+    await _beforeRequest();
+    final request = http.MultipartRequest('POST', Uri.parse('$_baseUrl$path'))
+      ..headers.addAll(_headers)
+      ..files.add(await http.MultipartFile.fromPath(field, filePath));
+    final res = await http.Response.fromStream(await request.send());
     return _handleResponse(res);
   }
 

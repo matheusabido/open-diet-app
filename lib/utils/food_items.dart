@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:open_diet/models/food.dart';
 import 'package:open_diet/models/food_item.dart';
+import 'package:open_diet/models/voice_food_item.dart';
 import 'package:open_diet/services/api.dart';
-import 'package:open_diet/utils/errors.dart';
-import 'package:open_diet/utils/toast.dart';
+import 'package:open_diet/utils/requests.dart';
 
 const _fieldLabels = {
   'food_id': 'Alimento',
@@ -10,10 +11,15 @@ const _fieldLabels = {
   'meal': 'Refeição',
   'amount': 'Quantidade',
   'unit': 'Unidade',
+  'audio': 'Áudio',
 };
 
 Future<void> addFoodItem(BuildContext context, FoodItemDraft draft) {
-  return _run(context, () => Api.instance.addFoodItem(draft));
+  return runRequest(
+    context,
+    () => Api.instance.addFoodItem(draft),
+    fieldLabels: _fieldLabels,
+  );
 }
 
 Future<void> updateFoodItem(
@@ -21,20 +27,25 @@ Future<void> updateFoodItem(
   FoodItem item,
   FoodItemDraft draft,
 ) {
-  return _run(context, () => Api.instance.updateFoodItem(item, draft));
+  return runRequest(
+    context,
+    () => Api.instance.updateFoodItem(item, draft),
+    fieldLabels: _fieldLabels,
+  );
 }
 
-Future<void> _run(BuildContext context, Future<void> Function() action) async {
-  String? error;
-  try {
-    await action();
-  } on ApiException catch (e) {
-    error = e.message ?? formatErrors(e.errors, _fieldLabels);
-  } catch (_) {
-    error = 'Não foi possível conectar ao servidor';
-  }
+Future<VoiceFoodItem?> voiceFoodItem(BuildContext context, String audioPath) {
+  return runRequest(
+    context,
+    () => Api.instance.voiceFoodItem(audioPath),
+    fieldLabels: _fieldLabels,
+  );
+}
 
-  if (error != null && context.mounted) {
-    showToast(context, error, type: ToastType.error);
-  }
+Future<bool> linkFoodAlias(BuildContext context, int aliasId, Food food) async {
+  final linked = await runRequest(context, () async {
+    await Api.instance.linkFoodAlias(aliasId, food);
+    return true;
+  }, fieldLabels: _fieldLabels);
+  return linked ?? false;
 }
